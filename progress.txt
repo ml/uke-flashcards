@@ -7,6 +7,8 @@ Started: Sun Feb  1 14:49:19 CET 2026
 - Next.js 14 uses App Router - pages go in src/app/, layout in layout.tsx
 - TypeScript types are in src/types/
 - Questions data stored in data/questions.json
+- Database utilities are in src/lib/ - use getDb() from src/lib/db.ts for database access
+- Questions are loaded via getQuestions() from src/lib/questions.ts (cached in memory)
 ---
 
 ## 2026-02-01 - US-002
@@ -29,4 +31,24 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - Use @tailwindcss/postcss instead of tailwindcss in postcss.config
   - Next.js 14 doesn't support .ts config files - use .mjs for next.config
   - Build passes and typecheck passes
+---
+
+## 2026-02-01 - US-003
+- Added SQLite database with better-sqlite3
+- Created database schema with sessions and attempts tables
+- Created database connection utility (src/lib/db.ts)
+- Created questions loader utility (src/lib/questions.ts) with caching
+- Added database types (src/types/database.ts)
+- Files changed:
+  - package.json (added better-sqlite3 dependency)
+  - package-lock.json (updated)
+  - .gitignore (added *.db, *.db-wal, *.db-shm)
+  - src/lib/db.ts (new - database connection and schema)
+  - src/lib/questions.ts (new - questions loader)
+  - src/types/database.ts (new - database types)
+- **Learnings for future iterations:**
+  - Use getDb() from src/lib/db.ts - it initializes schema automatically on first call
+  - Use getQuestions() from src/lib/questions.ts - it caches questions in memory
+  - Database uses WAL mode for better concurrent read performance
+  - Indexes created for question_id, session_id, and created_at on attempts table
 ---
