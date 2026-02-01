@@ -23,14 +23,13 @@
     },
     {
       "id": "US-002",
-      "title": "Initialize Next.js app with SQLite",
-      "description": "As a developer, I need the basic app structure so I can build features on top.",
+      "title": "Create Next.js app with Tailwind",
+      "description": "As a developer, I need the basic app structure with styling so I can build features on top.",
       "acceptanceCriteria": [
-        "Next.js app created with App Router",
-        "Tailwind CSS configured",
-        "SQLite database initialized with schema for: questions, attempts, sessions",
-        "Database stores: question_id, session_id, user_answer, is_correct, timestamp",
-        "Questions loaded from JSON into memory on app start",
+        "Next.js 14+ app created with App Router",
+        "Tailwind CSS configured and working",
+        "Basic layout with navigation placeholder (Study | Dashboard links)",
+        "Home page renders with app title",
         "Typecheck passes"
       ],
       "priority": 2,
@@ -39,6 +38,22 @@
     },
     {
       "id": "US-003",
+      "title": "Add SQLite database with schema",
+      "description": "As a developer, I need a database to store user attempts and session data.",
+      "acceptanceCriteria": [
+        "SQLite database initialized at data/uke-flashcards.db using better-sqlite3",
+        "Schema created for attempts table: id, question_id, session_id (nullable), selected_answer, is_correct, created_at",
+        "Schema created for sessions table: id, created_at, completed_at (nullable)",
+        "Database connection utility created for reuse across API routes",
+        "Questions loaded from data/questions.json into memory on app start",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
       "title": "Browse all questions sequentially",
       "description": "As a user, I want to browse through all questions one by one so I can study the entire question bank.",
       "acceptanceCriteria": [
@@ -51,12 +66,12 @@
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
-      "priority": 3,
+      "priority": 4,
       "passes": false,
       "notes": ""
     },
     {
-      "id": "US-004",
+      "id": "US-005",
       "title": "Filter questions by section",
       "description": "As a user, I want to study only questions from a specific section so I can focus on weak areas.",
       "acceptanceCriteria": [
@@ -68,12 +83,12 @@
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
-      "priority": 4,
+      "priority": 5,
       "passes": false,
       "notes": ""
     },
     {
-      "id": "US-005",
+      "id": "US-006",
       "title": "Start a 20-question session",
       "description": "As a user, I want to do timed practice sessions of 20 questions so I can simulate exam conditions.",
       "acceptanceCriteria": [
@@ -87,12 +102,12 @@
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
-      "priority": 5,
+      "priority": 6,
       "passes": false,
       "notes": ""
     },
     {
-      "id": "US-006",
+      "id": "US-007",
       "title": "Dashboard with statistics",
       "description": "As a user, I want to see my progress and weak areas so I know what to focus on.",
       "acceptanceCriteria": [
@@ -103,12 +118,12 @@
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
-      "priority": 6,
+      "priority": 7,
       "passes": false,
       "notes": ""
     },
     {
-      "id": "US-007",
+      "id": "US-008",
       "title": "Session history",
       "description": "As a user, I want to see my past sessions so I can track improvement over time.",
       "acceptanceCriteria": [
@@ -118,7 +133,7 @@
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
-      "priority": 7,
+      "priority": 8,
       "passes": false,
       "notes": ""
     }
