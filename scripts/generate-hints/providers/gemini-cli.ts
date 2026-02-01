@@ -7,7 +7,7 @@ import type { LLMProvider, BatchResult, HintExplanation } from './types';
 import { buildBatchPrompt } from '../prompt';
 
 const BATCH_SIZE = 25;
-const TIMEOUT_MS = 120000; // 2 minutes per batch
+const TIMEOUT_MS = 180000; // 3 minutes per batch (increased for rate limits)
 
 export async function checkGeminiInstalled(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -97,16 +97,34 @@ function parseGeminiResponse(output: string, expectedIds: string[]): BatchResult
   return { successful, failed };
 }
 
+function safeUnlink(filePath: string): void {
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch {
+    // Ignore cleanup errors - file may already be deleted
+  }
+}
+
 async function runGeminiCli(prompt: string): Promise<string> {
   return new Promise((resolve, reject) => {
     // Write prompt to temp file to avoid shell escaping issues
     const tempDir = os.tmpdir();
-    const tempFile = path.join(tempDir, `gemini-prompt-${Date.now()}.txt`);
+    const tempFile = path.join(tempDir, `gemini-prompt-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`);
     fs.writeFileSync(tempFile, prompt, 'utf-8');
 
-    const proc = spawn('gemini', [], {
+    let cleanedUp = false;
+    const cleanup = () => {
+      if (!cleanedUp) {
+        cleanedUp = true;
+        safeUnlink(tempFile);
+      }
+    };
+
+    // Use cat to pipe file content to gemini stdin (works better than --prompt @file)
+    const proc = spawn('bash', ['-c', `cat "${tempFile}" | gemini`], {
       stdio: ['pipe', 'pipe', 'pipe'],
-      shell: true,
     });
 
     let stdout = '';
@@ -120,19 +138,15 @@ async function runGeminiCli(prompt: string): Promise<string> {
       stderr += data.toString();
     });
 
-    // Pipe the prompt file to stdin
-    const promptStream = fs.createReadStream(tempFile);
-    promptStream.pipe(proc.stdin);
-
     const timeout = setTimeout(() => {
       proc.kill('SIGTERM');
-      fs.unlinkSync(tempFile);
+      cleanup();
       reject(new Error('Gemini CLI timeout'));
     }, TIMEOUT_MS);
 
     proc.on('close', (code) => {
       clearTimeout(timeout);
-      fs.unlinkSync(tempFile);
+      cleanup();
 
       if (code !== 0) {
         reject(new Error(`Gemini CLI exited with code ${code}: ${stderr}`));
@@ -143,11 +157,7 @@ async function runGeminiCli(prompt: string): Promise<string> {
 
     proc.on('error', (err) => {
       clearTimeout(timeout);
-      try {
-        fs.unlinkSync(tempFile);
-      } catch {
-        // Ignore cleanup errors
-      }
+      cleanup();
       reject(err);
     });
   });
