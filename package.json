@@ -9,7 +9,11 @@
     "start": "next start",
     "lint": "next lint",
     "fetch-questions": "tsx scripts/fetch-questions.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate-hints": "tsx scripts/generate-hints/index.ts --parallel=4",
+    "generate-hints:dry-run": "tsx scripts/generate-hints/index.ts --dry-run",
+    "generate-hints:resume": "tsx scripts/generate-hints/index.ts --resume --parallel=4",
+    "generate-hints:merge": "tsx scripts/generate-hints/merger.ts --confirm"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

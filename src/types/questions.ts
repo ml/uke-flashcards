@@ -31,6 +31,10 @@ export interface Question {
   correctAnswerLetter: string;
   /** The exam section this question belongs to */
   section: Section;
+  /** Hint to help answer (formulas, definitions, laws) - optional during migration */
+  hint?: string;
+  /** Explanation of why the correct answer is right - optional during migration */
+  explanation?: string;
 }
 
 /** The complete question bank structure */

@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Question, Section } from '@/types/questions';
+import { useHints } from '@/components/HintsContext';
 
 interface AttemptResponse {
   id: number;
@@ -33,6 +34,7 @@ const ALL_SECTIONS: Section[] = [
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { hintsEnabled, isHydrated } = useHints();
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -451,6 +453,19 @@ function StudyContent() {
           </h2>
         </div>
 
+        {/* Hint (shown when enabled and not yet answered) */}
+        {isHydrated && hintsEnabled && currentQuestion.hint && selectedAnswer === null && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 text-lg">&#128161;</span>
+              <div>
+                <span className="text-sm font-medium text-amber-800">Hint:</span>
+                <p className="text-amber-700 mt-1">{currentQuestion.hint}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Answers */}
         <div className="space-y-3">
           {currentQuestion.answers.map((answer) => (
@@ -475,9 +490,23 @@ function StudyContent() {
                 : 'bg-red-100 text-red-800'
             }`}
           >
-            {attemptResult.isCorrect
-              ? 'Correct!'
-              : `Incorrect. The correct answer is ${attemptResult.correctAnswer}.`}
+            <p className="font-medium">
+              {attemptResult.isCorrect
+                ? 'Correct!'
+                : `Incorrect. The correct answer is ${attemptResult.correctAnswer}.`}
+            </p>
+
+            {/* Explanation (always shown after answering) */}
+            {currentQuestion.explanation && (
+              <div className={`mt-3 pt-3 border-t ${
+                attemptResult.isCorrect
+                  ? 'border-green-200'
+                  : 'border-red-200'
+              }`}>
+                <span className="font-medium">Explanation:</span>
+                <p className="mt-1">{currentQuestion.explanation}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
