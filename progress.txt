@@ -111,3 +111,31 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - SQLite aggregation with subqueries for getting "last attempt was wrong" status
   - Disable section filter and Previous button during session mode
 ---
+
+## 2026-02-01 - US-007
+- Created dashboard page at /dashboard with comprehensive statistics
+- Added API endpoints:
+  - GET /api/stats - returns overall stats, per-section breakdown, and weak areas
+  - GET /api/stats/question/[id] - returns question details and attempt history
+- Implemented per-section statistics:
+  - Total questions, questions attempted, correctness rate
+  - Visual progress bar with 60% threshold marker
+  - PASS/FAIL badge for each section
+- Implemented weak areas section:
+  - Shows top 10 questions with lowest correctness rate
+  - Minimum 3 attempts required to appear in list
+  - Click to drill-down into question details
+- Implemented per-question drill-down modal:
+  - Shows question text and all answers (correct one highlighted)
+  - Statistics: total attempts, correct count, success rate
+  - Full attempt history with timestamps and session IDs
+- Files changed:
+  - src/app/dashboard/page.tsx (new - dashboard page with all components)
+  - src/app/api/stats/route.ts (new - statistics API)
+  - src/app/api/stats/question/[id]/route.ts (new - question detail API)
+- **Learnings for future iterations:**
+  - Use CAST(SUM(...) AS FLOAT) / COUNT(*) for correctness rate in SQLite
+  - Dynamic route params in Next.js 14 App Router use Promise<{ param: type }> syntax
+  - Modal overlays with fixed positioning and max-height for scrollable content
+  - line-clamp-1 utility for truncating long question text
+---

@@ -119,8 +119,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Dashboard at /dashboard with /api/stats and /api/stats/question/[id] endpoints. Per-section stats with 60% pass/fail threshold, weak areas (min 3 attempts), per-question drill-down with attempt history."
     },
     {
       "id": "US-008",
