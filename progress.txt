@@ -139,3 +139,24 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - Modal overlays with fixed positioning and max-height for scrollable content
   - line-clamp-1 utility for truncating long question text
 ---
+
+## 2026-02-01 - US-008
+- Added session history section to dashboard page
+- Created GET /api/sessions/history endpoint that returns:
+  - All sessions sorted by most recent first
+  - Questions correct/total for each session
+  - Pass/fail status (60% threshold)
+  - Sections covered as an array
+- Session history UI shows:
+  - Date in pl-PL locale format
+  - Correct/total with percentage
+  - PASS/FAIL badge
+  - Section tags for each session
+- Files changed:
+  - src/app/api/sessions/history/route.ts (new - session history API)
+  - src/app/dashboard/page.tsx (updated - added session history section)
+- **Learnings for future iterations:**
+  - Use LEFT JOIN to include sessions with no attempts (edge case)
+  - Build section coverage by mapping attempts to questions via question_id
+  - Keep session history fetch separate from stats to avoid blocking the main load
+---

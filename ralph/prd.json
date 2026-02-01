@@ -134,8 +134,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Session history section added to dashboard via GET /api/sessions/history. Shows all sessions with date, correct/total count, pass/fail badge, and sections covered as tags."
     }
   ]
 }
