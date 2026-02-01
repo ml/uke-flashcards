@@ -1,4 +1,32 @@
 # Ralph Progress Log - UKE Flashcards
 
+## Codebase Patterns
+- Authentication to egzaminkf.pl requires CSRF token from login page form
+- Question list is at `/pytania_lista.php?bank=new&perm=A` with pagination via `&page=N`
+- Correct answers are marked with `.is-ok` class on the `.p-ans` elements
+- Section/category is in `.p-cat` element with format "Dział: {section name}"
+- Use `email: x\npassword: y` format in `.credentials` file
+
+---
+
+## 2026-02-01 - US-001
+- What was implemented:
+  - Script to fetch UKE exam questions from egzaminkf.pl
+  - Authentication with CSRF token handling
+  - Parsing of question list pages (pytania_lista.php)
+  - TypeScript types for Question, Answer, Section, QuestionBank
+- Files changed:
+  - scripts/fetch-questions.ts (new)
+  - src/types/questions.ts (new)
+  - data/questions.json (new, 480 questions)
+  - package.json (new)
+  - tsconfig.json (new)
+  - .gitignore (updated)
+- **Learnings for future iterations:**
+  - egzaminkf.pl has a "learning assistant" feature at /pytania_lista.php that shows all questions with correct answers marked
+  - The test interface at /test.php doesn't reveal correct answers until test completion
+  - Pagination info is shown as "Strona: X/Y" in the HTML
+  - Questions are divided into 4 sections: Radiotechnika (330), Procedury operatorskie (61), Przepisy (54), Bezpieczeństwo (35)
+  - The site uses both old (pre-2024) and new (2024+) question sets, and category A (kat. 1) vs C (kat. 3) licenses
 ---
 

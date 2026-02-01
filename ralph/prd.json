@@ -18,8 +18,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fetched 480 questions from pytania_lista.php endpoint"
     },
     {
       "id": "US-002",
