@@ -1,0 +1,126 @@
+{
+  "project": "UKE Flashcards",
+  "branchName": "ralph/uke-flashcards",
+  "description": "A flashcards application to help users study for the UKE amateur radio exam (egzamin krótkofalarza). Fetches questions from egzaminkf.pl, stores them locally, and provides interactive study with spaced repetition.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Fetch questions from source website",
+      "description": "As a developer, I need to fetch all questions from the gated website so users have access to the complete question bank.",
+      "acceptanceCriteria": [
+        "Script reads credentials from .credentials file (format: email\\npassword)",
+        "Script authenticates to egzaminkf.pl/login.php",
+        "Script fetches pages 1-21 from the question bank",
+        "Script parses HTML to extract: question number, question text, all answers, correct answer, section",
+        "Script saves parsed data as JSON to data/questions.json",
+        "TypeScript types defined for Question, Answer, and Section",
+        "Script handles errors gracefully (auth failure, network issues)",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Initialize Next.js app with SQLite",
+      "description": "As a developer, I need the basic app structure so I can build features on top.",
+      "acceptanceCriteria": [
+        "Next.js app created with App Router",
+        "Tailwind CSS configured",
+        "SQLite database initialized with schema for: questions, attempts, sessions",
+        "Database stores: question_id, session_id, user_answer, is_correct, timestamp",
+        "Questions loaded from JSON into memory on app start",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Browse all questions sequentially",
+      "description": "As a user, I want to browse through all questions one by one so I can study the entire question bank.",
+      "acceptanceCriteria": [
+        "Main study page shows one question at a time",
+        "Question displays: number, text, section label, all answer options",
+        "Clicking an answer reveals if it's correct (green) or wrong (red + show correct)",
+        "Next button appears after answering to advance",
+        "Progress indicator shows current position (e.g., 42 / 847)",
+        "Attempt recorded in database on answer",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Filter questions by section",
+      "description": "As a user, I want to study only questions from a specific section so I can focus on weak areas.",
+      "acceptanceCriteria": [
+        "Section selector dropdown on study page",
+        "Options: All sections + each of the 4 sections",
+        "Selecting a section filters the question pool",
+        "Progress indicator updates to reflect filtered count",
+        "Selection persists in URL params",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Start a 20-question session",
+      "description": "As a user, I want to do timed practice sessions of 20 questions so I can simulate exam conditions.",
+      "acceptanceCriteria": [
+        "Start Session button on home/study page",
+        "Session selects 20 questions using spaced repetition: 10 least answered (prioritize never-seen), 10 wrong (prioritize recent failures)",
+        "Session respects current section filter",
+        "Session progress shows 5 / 20 style indicator",
+        "Session ends after 20 questions with summary",
+        "Session summary shows: correct count, incorrect count, per-section breakdown",
+        "All attempts recorded with session_id in database",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Dashboard with statistics",
+      "description": "As a user, I want to see my progress and weak areas so I know what to focus on.",
+      "acceptanceCriteria": [
+        "Dashboard page accessible from navigation",
+        "Per-section statistics: total questions, questions attempted, correctness percentage, visual indicator for 60% threshold (pass/fail status)",
+        "Weak areas section: list of questions with lowest correctness rate (minimum 3 attempts to appear)",
+        "Per-question drill-down available (click to see attempt history)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Session history",
+      "description": "As a user, I want to see my past sessions so I can track improvement over time.",
+      "acceptanceCriteria": [
+        "Session history list on dashboard",
+        "Each session shows: date, questions correct/total, sections covered",
+        "Sessions sorted by most recent first",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
