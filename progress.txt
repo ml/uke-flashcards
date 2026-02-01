@@ -1,3 +1,32 @@
 # Ralph Progress Log
 Started: Sun Feb  1 14:49:19 CET 2026
 ---
+
+## Codebase Patterns
+- Use Tailwind CSS v4 with @tailwindcss/postcss - CSS-first config via `@import "tailwindcss"` in globals.css
+- Next.js 14 uses App Router - pages go in src/app/, layout in layout.tsx
+- TypeScript types are in src/types/
+- Questions data stored in data/questions.json
+---
+
+## 2026-02-01 - US-002
+- Implemented Next.js 14.2.35 with App Router
+- Configured Tailwind CSS v4 with @tailwindcss/postcss
+- Created basic layout with navigation (Study | Dashboard links)
+- Created home page with app title and call-to-action buttons
+- Files changed:
+  - package.json (added Next.js scripts and dependencies)
+  - tsconfig.json (updated for Next.js JSX support)
+  - next-env.d.ts (new - Next.js types)
+  - next.config.mjs (new - Next.js config)
+  - postcss.config.mjs (new - PostCSS with Tailwind)
+  - src/app/globals.css (new - Tailwind import)
+  - src/app/layout.tsx (new - root layout with navigation)
+  - src/app/page.tsx (new - home page)
+  - .gitignore (added .next and out)
+- **Learnings for future iterations:**
+  - Tailwind CSS v4 uses CSS-first configuration with `@import "tailwindcss"` - no tailwind.config.js needed
+  - Use @tailwindcss/postcss instead of tailwindcss in postcss.config
+  - Next.js 14 doesn't support .ts config files - use .mjs for next.config
+  - Build passes and typecheck passes
+---

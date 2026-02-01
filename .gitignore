@@ -6,3 +6,6 @@ data/debug-*.html
 # Next.js
 .next
 out
+
+# TypeScript build cache
+*.tsbuildinfo
