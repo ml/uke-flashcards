@@ -9,6 +9,8 @@ Started: Sun Feb  1 14:49:19 CET 2026
 - Questions data stored in data/questions.json
 - Database utilities are in src/lib/ - use getDb() from src/lib/db.ts for database access
 - Questions are loaded via getQuestions() from src/lib/questions.ts (cached in memory)
+- API routes go in src/app/api/[route]/route.ts - export GET/POST handlers
+- Client components need 'use client' directive at top when using React hooks
 ---
 
 ## 2026-02-01 - US-002
@@ -51,4 +53,21 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - Use getQuestions() from src/lib/questions.ts - it caches questions in memory
   - Database uses WAL mode for better concurrent read performance
   - Indexes created for question_id, session_id, and created_at on attempts table
+---
+
+## 2026-02-01 - US-004
+- Created study page with sequential question browsing
+- Added API endpoint to fetch all questions (GET /api/questions)
+- Added API endpoint to record attempts (POST /api/attempts)
+- Implemented interactive flashcard UI with answer selection and feedback
+- Added progress indicator showing current position (e.g., "42 / 480")
+- Files changed:
+  - src/app/study/page.tsx (new - study page component)
+  - src/app/api/questions/route.ts (new - questions API)
+  - src/app/api/attempts/route.ts (new - attempts API)
+- **Learnings for future iterations:**
+  - API routes in Next.js 14 App Router go in src/app/api/[route]/route.ts
+  - Use 'use client' directive for components with React hooks (useState, useEffect)
+  - POST /api/attempts validates question exists and returns isCorrect + correctAnswer
+  - Database correctly stores attempts with is_correct as 0 or 1
 ---

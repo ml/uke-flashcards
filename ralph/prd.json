@@ -67,8 +67,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Study page at /study with /api/questions and /api/attempts endpoints"
     },
     {
       "id": "US-005",
