@@ -1,0 +1,19 @@
+{
+  "name": "uke-flashcards",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flashcards app for UKE amateur radio exam preparation",
+  "scripts": {
+    "fetch-questions": "tsx scripts/fetch-questions.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
