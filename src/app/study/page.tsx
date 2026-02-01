@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { Question } from '@/types/questions';
+import { Suspense, useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import type { Question, Section } from '@/types/questions';
 
 interface AttemptResponse {
   id: number;
@@ -9,13 +10,34 @@ interface AttemptResponse {
   correctAnswer: string;
 }
 
-export default function StudyPage() {
-  const [questions, setQuestions] = useState<Question[]>([]);
+const ALL_SECTIONS: Section[] = [
+  'Radiotechnika',
+  'Przepisy',
+  'Bezpieczeństwo',
+  'Procedury operatorskie',
+];
+
+function StudyContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [attemptResult, setAttemptResult] = useState<AttemptResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get selected section from URL params
+  const selectedSection = searchParams.get('section') as Section | null;
+
+  // Filter questions by section
+  const questions = useMemo(() => {
+    if (!selectedSection) {
+      return allQuestions;
+    }
+    return allQuestions.filter((q) => q.section === selectedSection);
+  }, [allQuestions, selectedSection]);
 
   useEffect(() => {
     async function loadQuestions() {
@@ -25,7 +47,7 @@ export default function StudyPage() {
           throw new Error('Failed to load questions');
         }
         const data = await response.json();
-        setQuestions(data.questions);
+        setAllQuestions(data.questions);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -34,6 +56,26 @@ export default function StudyPage() {
     }
     loadQuestions();
   }, []);
+
+  // Reset index when section changes
+  useEffect(() => {
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setAttemptResult(null);
+  }, [selectedSection]);
+
+  const handleSectionChange = useCallback(
+    (section: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (section === '') {
+        params.delete('section');
+      } else {
+        params.set('section', section);
+      }
+      router.push(`/study?${params.toString()}`);
+    },
+    [router, searchParams]
+  );
 
   const currentQuestion = questions[currentIndex];
 
@@ -117,16 +159,58 @@ export default function StudyPage() {
     );
   }
 
-  if (!currentQuestion) {
+  if (questions.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-slate-600">No questions available</div>
+      <div className="space-y-6">
+        {/* Section filter */}
+        <div className="flex items-center gap-4">
+          <label htmlFor="section-filter" className="text-sm font-medium text-slate-700">
+            Section:
+          </label>
+          <select
+            id="section-filter"
+            value={selectedSection || ''}
+            onChange={(e) => handleSectionChange(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All sections</option>
+            {ALL_SECTIONS.map((section) => (
+              <option key={section} value={section}>
+                {section}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center justify-center py-12">
+          <div className="text-slate-600">No questions available for this section</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Section filter */}
+      <div className="flex items-center gap-4">
+        <label htmlFor="section-filter" className="text-sm font-medium text-slate-700">
+          Section:
+        </label>
+        <select
+          id="section-filter"
+          value={selectedSection || ''}
+          onChange={(e) => handleSectionChange(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="">All sections</option>
+          {ALL_SECTIONS.map((section) => (
+            <option key={section} value={section}>
+              {section}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Progress indicator */}
       <div className="flex items-center justify-between text-sm text-slate-600">
         <span className="bg-slate-200 px-3 py-1 rounded-full">
@@ -205,5 +289,21 @@ export default function StudyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function StudyLoading() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="text-slate-600">Loading...</div>
+    </div>
+  );
+}
+
+export default function StudyPage() {
+  return (
+    <Suspense fallback={<StudyLoading />}>
+      <StudyContent />
+    </Suspense>
   );
 }
