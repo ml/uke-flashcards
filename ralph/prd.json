@@ -103,8 +103,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Session API at /api/sessions, spaced repetition selection (never-seen + recent failures), summary with per-section breakdown"
     },
     {
       "id": "US-007",

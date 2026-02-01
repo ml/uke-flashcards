@@ -88,3 +88,26 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - useMemo for filtering based on URL params to avoid unnecessary re-renders
   - Reset related state (currentIndex, selectedAnswer) when filter changes via useEffect
 ---
+
+## 2026-02-01 - US-006
+- Added 20-question session mode to study page
+- Created /api/sessions endpoint with POST (start) and PATCH (complete) methods
+- Implemented spaced repetition question selection:
+  - First 10: never-seen questions or least attempted
+  - Then fill with: questions where user failed recently
+  - Shuffle final selection for variety
+- Session mode shows progress as "5 / 20" format
+- Session summary displays after last question:
+  - Total correct/incorrect with pass/fail indicator (60% threshold)
+  - Per-section breakdown with individual pass/fail status
+- All attempts recorded with session_id linking them together
+- Files changed:
+  - src/app/api/sessions/route.ts (new - session management API)
+  - src/app/study/page.tsx (updated - added session mode, summary view)
+- **Learnings for future iterations:**
+  - Session mode reuses same study page component with conditional rendering
+  - Use useMemo to switch between allQuestions and sessionData.questions based on mode
+  - PATCH method for partial updates (completing a session vs POST for creation)
+  - SQLite aggregation with subqueries for getting "last attempt was wrong" status
+  - Disable section filter and Previous button during session mode
+---
