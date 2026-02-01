@@ -2,3 +2,7 @@ logs
 .credentials
 node_modules
 data/debug-*.html
+
+# Next.js
+.next
+out
