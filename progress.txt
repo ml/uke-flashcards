@@ -11,6 +11,8 @@ Started: Sun Feb  1 14:49:19 CET 2026
 - Questions are loaded via getQuestions() from src/lib/questions.ts (cached in memory)
 - API routes go in src/app/api/[route]/route.ts - export GET/POST handlers
 - Client components need 'use client' directive at top when using React hooks
+- Wrap components using useSearchParams in Suspense for Next.js static generation
+- Use useSearchParams + useRouter for URL state management in client components
 ---
 
 ## 2026-02-01 - US-002
@@ -70,4 +72,19 @@ Started: Sun Feb  1 14:49:19 CET 2026
   - Use 'use client' directive for components with React hooks (useState, useEffect)
   - POST /api/attempts validates question exists and returns isCorrect + correctAnswer
   - Database correctly stores attempts with is_correct as 0 or 1
+---
+
+## 2026-02-01 - US-005
+- Added section filter dropdown to study page
+- Filter options: All sections + 4 specific sections (Radiotechnika, Przepisy, Bezpieczeństwo, Procedury operatorskie)
+- Questions filtered using useMemo based on selected section
+- Selection persists in URL using ?section= query param
+- Progress indicator updates to show filtered count (e.g., "1 / 330" for Radiotechnika)
+- Files changed:
+  - src/app/study/page.tsx (updated - added section filter with Suspense wrapper)
+- **Learnings for future iterations:**
+  - useSearchParams() requires Suspense wrapper for Next.js static generation
+  - Use useRouter().push() with URLSearchParams for URL state management
+  - useMemo for filtering based on URL params to avoid unnecessary re-renders
+  - Reset related state (currentIndex, selectedAnswer) when filter changes via useEffect
 ---
