@@ -41,6 +41,16 @@ interface QuestionAttempt {
   sessionId: number | null;
 }
 
+interface SessionHistory {
+  id: number;
+  createdAt: string;
+  completedAt: string | null;
+  questionsCorrect: number;
+  questionsTotal: number;
+  sectionsCovered: string[];
+  passed: boolean;
+}
+
 interface QuestionDetail {
   question: {
     id: string;
@@ -65,9 +75,12 @@ export default function DashboardPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
   const [questionDetail, setQuestionDetail] = useState<QuestionDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [sessionHistory, setSessionHistory] = useState<SessionHistory[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   useEffect(() => {
     fetchStats();
+    fetchSessionHistory();
   }, []);
 
   async function fetchStats() {
@@ -82,6 +95,21 @@ export default function DashboardPage() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchSessionHistory() {
+    try {
+      const response = await fetch('/api/sessions/history');
+      if (!response.ok) {
+        throw new Error('Failed to fetch session history');
+      }
+      const data = await response.json();
+      setSessionHistory(data.sessions);
+    } catch (err) {
+      console.error('Failed to fetch session history:', err);
+    } finally {
+      setLoadingHistory(false);
     }
   }
 
@@ -189,6 +217,24 @@ export default function DashboardPage() {
                 onClick={() => fetchQuestionDetail(question.id)}
                 isSelected={selectedQuestion === question.id}
               />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Session History */}
+      <section className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-slate-800 mb-4">Session History</h2>
+        {loadingHistory ? (
+          <p className="text-slate-500">Loading session history...</p>
+        ) : sessionHistory.length === 0 ? (
+          <p className="text-slate-500">
+            No sessions yet. Start a 20-question session to see your history here.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {sessionHistory.map((session) => (
+              <SessionHistoryRow key={session.id} session={session} />
             ))}
           </div>
         )}
@@ -448,6 +494,56 @@ function QuestionDetailModal({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function SessionHistoryRow({ session }: { session: SessionHistory }) {
+  const percentage =
+    session.questionsTotal > 0
+      ? ((session.questionsCorrect / session.questionsTotal) * 100).toFixed(0)
+      : 0;
+
+  return (
+    <div
+      className={`p-4 rounded-lg border ${
+        session.passed ? 'border-green-200 bg-green-50' : 'border-slate-200 bg-slate-50'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span
+            className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+              session.passed
+                ? 'bg-green-100 text-green-700'
+                : session.questionsTotal > 0
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            {session.questionsTotal > 0 ? (session.passed ? 'PASS' : 'FAIL') : 'No attempts'}
+          </span>
+          <span className="text-lg font-semibold text-slate-800">
+            {session.questionsCorrect} / {session.questionsTotal}
+          </span>
+          <span className="text-slate-500">({percentage}%)</span>
+        </div>
+        <span className="text-sm text-slate-500">
+          {new Date(session.createdAt).toLocaleString('pl-PL')}
+        </span>
+      </div>
+      {session.sectionsCovered.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {session.sectionsCovered.map((section) => (
+            <span
+              key={section}
+              className="text-xs px-2 py-0.5 bg-slate-100 text-slate-500 rounded"
+            >
+              {section}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
