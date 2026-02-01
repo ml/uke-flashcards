@@ -9,3 +9,8 @@ out
 
 # TypeScript build cache
 *.tsbuildinfo
+
+# SQLite database
+*.db
+*.db-wal
+*.db-shm
