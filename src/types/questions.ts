@@ -35,6 +35,8 @@ export interface Question {
   hint?: string;
   /** Explanation of why the correct answer is right - optional during migration */
   explanation?: string;
+  /** Local path to question diagram image (e.g., "/images/questions/Q90.png") */
+  imageUrl?: string;
 }
 
 /** The complete question bank structure */

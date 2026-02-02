@@ -14,6 +14,13 @@ import * as cheerio from "cheerio";
 import type { Question, QuestionBank, Section, Answer } from "../src/types/questions";
 
 const BASE_URL = "https://egzaminkf.pl";
+const IMAGES_DIR = path.join(process.cwd(), "public", "images", "questions");
+const IMAGE_DOWNLOAD_DELAY_MS = 300;
+
+/** Extended question type with temporary raw image URL from source */
+interface QuestionWithRawImage extends Question {
+  _rawImageUrl?: string | null;
+}
 
 interface Credentials {
   email: string;
@@ -186,6 +193,85 @@ function mapSection(sectionText: string): Section {
 }
 
 /**
+ * Download an image from the source site and save locally
+ * @param relativeUrl - The relative URL from the source (e.g., "/images/a_1_265.png")
+ * @param questionId - The question ID to use for the local filename
+ * @param cookieJar - Cookie jar for authenticated requests
+ * @returns The local URL path or null if download failed
+ */
+async function downloadImage(
+  relativeUrl: string,
+  questionId: string,
+  cookieJar: CookieJar
+): Promise<string | null> {
+  try {
+    const url = `${BASE_URL}${relativeUrl}`;
+    const response = await fetch(url, {
+      headers: {
+        Cookie: cookieJar.getCookieHeader(),
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      console.warn(`  Failed to fetch image for ${questionId}: ${response.status}`);
+      return null;
+    }
+
+    // Get extension from original URL
+    const ext = path.extname(relativeUrl) || ".png";
+    const filename = `${questionId}${ext}`;
+    const localPath = path.join(IMAGES_DIR, filename);
+
+    // Skip if already exists
+    if (fs.existsSync(localPath)) {
+      console.log(`  Image already exists: ${filename}`);
+      return `/images/questions/${filename}`;
+    }
+
+    const buffer = await response.arrayBuffer();
+    fs.writeFileSync(localPath, Buffer.from(buffer));
+    console.log(`  Downloaded: ${filename}`);
+    return `/images/questions/${filename}`;
+  } catch (err) {
+    console.warn(`  Failed to download image for ${questionId}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Merge new questions with existing data to preserve hints and explanations
+ */
+function mergeWithExisting(newQuestions: Question[]): Question[] {
+  const existingPath = path.join(process.cwd(), "data", "questions.json");
+  if (!fs.existsSync(existingPath)) {
+    console.log("No existing questions.json found, skipping merge");
+    return newQuestions;
+  }
+
+  console.log("Merging with existing questions to preserve hints/explanations...");
+  const existing: QuestionBank = JSON.parse(fs.readFileSync(existingPath, "utf-8"));
+  const existingMap = new Map(existing.questions.map((q) => [q.id, q]));
+
+  let preservedCount = 0;
+  const merged = newQuestions.map((q) => {
+    const old = existingMap.get(q.id);
+    if (old && (old.hint || old.explanation)) {
+      preservedCount++;
+    }
+    return {
+      ...q,
+      hint: q.hint || old?.hint,
+      explanation: q.explanation || old?.explanation,
+    };
+  });
+
+  console.log(`Preserved hints/explanations for ${preservedCount} questions`);
+  return merged;
+}
+
+/**
  * Fetch a single page of questions from the question list
  */
 async function fetchQuestionListPage(
@@ -215,9 +301,9 @@ async function fetchQuestionListPage(
  * Parse questions from the question list page HTML
  * The list shows questions with the correct answer marked as .is-ok
  */
-function parseQuestionsFromListPage(html: string): Question[] {
+function parseQuestionsFromListPage(html: string): QuestionWithRawImage[] {
   const $ = cheerio.load(html);
-  const questions: Question[] = [];
+  const questions: QuestionWithRawImage[] = [];
 
   // Each question is in a .p-card container
   $(".p-card").each((_, element) => {
@@ -237,6 +323,10 @@ function parseQuestionsFromListPage(html: string): Question[] {
     const sectionMatch = categoryText.match(/Dział:\s*(.+)/i);
     const sectionName = sectionMatch ? sectionMatch[1].trim() : "Radiotechnika";
     const section = mapSection(sectionName);
+
+    // Extract image URL if present (images are in .p-img > img)
+    const $img = $card.find(".p-img img");
+    const rawImageUrl = $img.attr("src") || null;
 
     // Extract answers
     const answers: Answer[] = [];
@@ -269,6 +359,7 @@ function parseQuestionsFromListPage(html: string): Question[] {
         answers,
         correctAnswerLetter,
         section,
+        _rawImageUrl: rawImageUrl,
       });
     }
   });
@@ -308,10 +399,10 @@ function getTotalPages(html: string): number {
 /**
  * Fetch all questions from the question list pages
  */
-async function fetchAllQuestionsFromList(cookieJar: CookieJar): Promise<Question[]> {
+async function fetchAllQuestionsFromList(cookieJar: CookieJar): Promise<QuestionWithRawImage[]> {
   console.log("Fetching questions from question list (pytania_lista.php)...\n");
 
-  const allQuestions: Question[] = [];
+  const allQuestions: QuestionWithRawImage[] = [];
 
   // Fetch first page to determine total pages
   const firstPageHtml = await fetchQuestionListPage(1, cookieJar);
@@ -401,7 +492,7 @@ async function main(): Promise<void> {
     }
 
     // Step 4: Deduplicate by question text (in case of any duplicates across pages)
-    const uniqueQuestions = new Map<string, Question>();
+    const uniqueQuestions = new Map<string, QuestionWithRawImage>();
     for (const q of questions) {
       const key = q.text.toLowerCase().replace(/\s+/g, " ").trim();
       if (!uniqueQuestions.has(key)) {
@@ -410,17 +501,43 @@ async function main(): Promise<void> {
     }
 
     // Renumber questions sequentially
-    const finalQuestions = Array.from(uniqueQuestions.values()).map((q, index) => ({
+    const renumberedQuestions = Array.from(uniqueQuestions.values()).map((q, index) => ({
       ...q,
       id: `Q${index + 1}`,
       number: index + 1,
     }));
 
-    // Step 5: Save to file
+    // Step 5: Download images for questions that have them
+    if (!fs.existsSync(IMAGES_DIR)) {
+      fs.mkdirSync(IMAGES_DIR, { recursive: true });
+    }
+
+    const questionsWithImages = renumberedQuestions.filter((q) => q._rawImageUrl);
+    console.log(`\nDownloading images for ${questionsWithImages.length} questions...`);
+
+    for (const q of renumberedQuestions) {
+      if (q._rawImageUrl) {
+        const localUrl = await downloadImage(q._rawImageUrl, q.id, cookieJar);
+        if (localUrl) {
+          q.imageUrl = localUrl;
+        }
+        // Rate limit image downloads
+        await new Promise((resolve) => setTimeout(resolve, IMAGE_DOWNLOAD_DELAY_MS));
+      }
+      // Remove temporary property
+      delete q._rawImageUrl;
+    }
+
+    // Step 6: Merge with existing data to preserve hints/explanations
+    const finalQuestions = mergeWithExisting(renumberedQuestions);
+
+    // Step 7: Save to file
     saveQuestions(finalQuestions);
 
     console.log("\n=== Summary ===");
     console.log(`Total unique questions: ${finalQuestions.length}`);
+    const imageCount = finalQuestions.filter((q) => q.imageUrl).length;
+    console.log(`Questions with images: ${imageCount}`);
     console.log("Questions by section:");
     const sectionCounts: Record<string, number> = {};
     for (const q of finalQuestions) {

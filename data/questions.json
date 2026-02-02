@@ -2067,6 +2067,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q90.png",
       "hint": "Zwróć uwagę, ile diod jest w układzie i jak przepuszczają prąd. Czy prąd płynie do obciążenia podczas obu połówek sinusoidy napięcia wejściowego, czy tylko jednej?",
       "explanation": "Schemat przedstawia prostownik z jedną diodą, która przepuszcza prąd tylko podczas jednej (dodatniej lub ujemnej, w zależności od jej wpięcia) połówki okresu napięcia przemiennego. Dlatego nazywa się go jednopołówkowym. Prostownik dwupołówkowy i mostkowy wykorzystują dwie lub cztery diody do prostowania obu połówek okresu."
     },
@@ -2159,6 +2160,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q94.png",
       "hint": "Pętla PLL służy do stabilizacji częstotliwości jakiegoś generatora. Jaki jest główny, \"wyjściowy\" element tego układu?",
       "explanation": "Blok 1 w typowym schemacie pętli synchronizacji fazowej (PLL) to generator przestrajalny napięciem (VCO), którego częstotliwość jest właśnie stabilizowana przez resztę układu. Sygnał z tego generatora jest sygnałem wyjściowym całego bloku. Komparator (detektor fazy) i dzielnik znajdują się w innych miejscach pętli."
     },
@@ -2182,6 +2184,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q95.png",
       "hint": "Aby ustabilizować jeden generator, potrzebujemy drugiego, bardzo stabilnego generatora, który będzie punktem odniesienia. Jak nazywamy taki element?",
       "explanation": "Blok 4 to generator wzorcowy (najczęściej kwarcowy), który dostarcza bardzo stabilnego sygnału odniesienia. Jego częstotliwość, po ewentualnym podziale, jest porównywana w komparatorze fazy z częstotliwością generatora stabilizowanego (VCO), również po podziale. Dzielnik wzorca i komparator to inne bloki w tej pętli."
     },
@@ -2205,6 +2208,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q96.png",
       "hint": "Pierwszym elementem toru odbiorczego, zaraz za anteną, jest układ, który ma za zadanie wstępnie wyselekcjonować żądane pasmo i odrzucić silne sygnały spoza niego.",
       "explanation": "Blok 1, znajdujący się na samym wejściu odbiornika (zaraz za anteną), to filtr wejściowy lub obwody wejściowe. Jego zadaniem jest wstępna selekcja odbieranego sygnału, aby do dalszych stopni (np. wzmacniacza w.cz.) nie dostały się silne sygnały z innych pasm, mogące powodować zakłócenia. Wzmacniacz akustyczny i detektor znajdują się na samym końcu toru odbiorczego."
     },
@@ -2228,6 +2232,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q97.png",
       "hint": "Ostatnim blokiem w torze sygnałowym odbiornika, tuż przed głośnikiem lub słuchawkami, jest wzmacniacz, który podnosi poziom sygnału małej częstotliwości do poziomu użytecznego.",
       "explanation": "Blok 5 to wzmacniacz mocy małej częstotliwości (m.cz.), nazywany też wzmacniaczem akustycznym. Znajduje się on za detektorem i regulatorem głośności, a jego zadaniem jest wzmocnienie sygnału audio do poziomu wymaganego do wysterowania głośnika lub słuchawek. Heterodyna i detektor AM znajdują się znacznie wcześniej w torze odbiornika."
     },
@@ -2251,6 +2256,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q98.png",
       "hint": "W bardziej rozbudowanych odbiornikach, zaraz za filtrami wejściowymi, umieszcza się wzmacniacz, aby wzmocnić słabe sygnały z anteny, jeszcze przed pierwszą przemianą częstotliwości.",
       "explanation": "W odbiornikach o dużej czułości, takich jak ten ze schematu, blok 1 to wzmacniacz wielkiej częstotliwości (w.cz.). Jego celem jest wzmocnienie słabego sygnału z anteny, co poprawia ogólny stosunek sygnału do szumu odbiornika. Wzmacniacz akustyczny i detektor są na końcu toru sygnałowego."
     },
@@ -2274,6 +2280,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q99.png",
       "hint": "Tak jak w prostszym odbiorniku, ostatnim elementem przed głośnikiem jest wzmacniacz sygnału słyszalnego.",
       "explanation": "Niezależnie od stopnia skomplikowania toru odbiorczego, ostatnim blokiem przed przetwornikiem elektroakustycznym (głośnikiem/słuchawkami) jest zawsze wzmacniacz mocy małej częstotliwości (akustyczny). Blok 9 znajduje się właśnie w tym miejscu, za detektorem produktu i filtrem m.cz."
     },
@@ -2297,6 +2304,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q100.png",
       "hint": "Każdy odbiornik, niezależnie od jego konstrukcji (superheterodyna, homodyna), musi mieć na wejściu układ selekcjonujący pożądane pasmo.",
       "explanation": "Blok 1 w odbiorniku homodynowym (z bezpośrednią przemianą) pełni tę samą funkcję co w każdym innym odbiorniku - jest to filtr wejściowy (pasmowoprzepustowy). Jego zadaniem jest przepuszczenie sygnałów z żądanego pasma amatorskiego i stłumienie wszystkich innych, co zapobiega powstawaniu zakłóceń w mieszaczu."
     },
@@ -2320,6 +2328,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q101.png",
       "hint": "W odbiorniku superheterodynowym, sygnał z anteny musi zostać najpierw zmieniony na stałą częstotliwość pośrednią (p.cz.). Blok odpowiedzialny za tę konwersję miesza sygnał wejściowy z sygnałem z lokalnego oscylatora.",
       "explanation": "Blok 2 to I mieszacz, który jest kluczowym elementem odbiornika superheterodynowego. Jego zadaniem jest zmiana częstotliwości sygnału wejściowego na pierwszą częstotliwość pośrednią poprzez zmieszanie go z sygnałem heterodyny. Wzmacniacz akustyczny (A) znajduje się na samym końcu toru odbiorczego, a wzmacniacz II p.cz. (C) występowałby w dalszej części odbiornika z podwójną przemianą, już za drugim mieszaczem."
     },
@@ -2366,6 +2375,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q103.png",
       "hint": "Ostatnim blokiem w torze nadawczym, tuż przed anteną, jest układ, który musi oczyścić sygnał z niepożądanych częstotliwości harmonicznych, aby nadajnik nie zakłócał innych pasm.",
       "explanation": "Blok 4 to filtr wyjściowy, zazwyczaj filtr dolnoprzepustowy. Jego zadaniem jest stłumienie harmonicznych i innych produktów niepożądanych, które powstają we wzmacniaczu mocy (PA), zanim zostaną wypromieniowane przez antenę. Wzmacniacz mocy (B) znajduje się bezpośrednio przed filtrem, a separator (C) jest stopniem buforowym, umieszczonym za oscylatorem."
     },
@@ -2389,6 +2399,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q104.png",
       "hint": "Każdy nadajnik musi posiadać źródło sygnału, czyli układ generujący drgania o określonej częstotliwości. W nadajnikach z płynną zmianą częstotliwości nazywa się go oscylatorem o zmiennej częstotliwości (VFO).",
       "explanation": "Blok 1 to oscylator VFO (Variable Frequency Oscillator). Generuje on podstawowy sygnał, którego częstotliwość może być regulowana przez operatora. Sygnał ten jest następnie wzmacniany i/lub powielany, aby uzyskać sygnał wyjściowy na docelowym paśmie amatorskim. Wzmacniacz mocy (A) i separator (C) to inne, późniejsze stopnie nadajnika."
     },
@@ -2412,6 +2423,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q105.png",
       "hint": "Schemat przedstawia nadajnik SSB. Sercem takiego nadajnika jest specjalizowany układ, który generuje sygnał jednowstęgowy (SSB) na stałej częstotliwości pośredniej, zanim zostanie on przemieniony na częstotliwość docelową.",
       "explanation": "Blok 1 to wzbudnica SSB 9 MHz. Jest to kompletny generator, który z sygnału mowy i sygnału nośnej tworzy sygnał SSB na stałej częstotliwości (w tym przypadku 9 MHz). Oscylator VFO (B) służy do przemiany tego sygnału na pasmo docelowe, a wzmacniacz mocy (A) wzmacnia sygnał przed wysłaniem go do anteny."
     },
@@ -2435,6 +2447,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q106.png",
       "hint": "Aby przenieść sygnał SSB z częstotliwości wzbudnicy (9 MHz) na docelową częstotliwość nadawania (np. w paśmie 3,5 MHz lub 7 MHz), potrzebny jest blok, który \"miesza\" go z sygnałem z oscylatora VFO.",
       "explanation": "Blok 2 to mieszacz. Otrzymuje on sygnał SSB z wzbudnicy (Blok 1) oraz sygnał z VFO. Na wyjściu mieszacza powstają produkty mieszania (suma i różnica częstotliwości), z których odpowiedni filtr pasmowy wybiera ten, który odpowiada docelowemu pasmu nadawania. Wzmacniacz sterujący (A) i filtr wyjściowy (C) to kolejne stopnie toru nadawczego."
     },
@@ -2504,6 +2517,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q109.png",
       "hint": "W antenie typu Yagi, element umieszczony z tyłu, który jest najdłuższy i \"odbija\" fale radiowe we właściwym kierunku, nosi specyficzną nazwę.",
       "explanation": "Element 1 to reflektor (odbłyśnik). Jest on nieco dłuższy od elementu aktywnego (wibratora) i jego zadaniem jest odbicie energii w kierunku przeciwnym, czyli w stronę direktorów, co kształtuje kierunkową charakterystykę anteny. Wibrator (B) to element zasilany, a direktor (C) znajduje się z przodu anteny."
     },
@@ -2527,6 +2541,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q110.png",
       "hint": "W antenie Yagi-Uda, elementem, do którego podłączony jest kabel zasilający (koncentryczny) i który jest \"sercem\" anteny, jest element czynny, zwany też wibratorem.",
       "explanation": "Element 2 to wibrator, czyli element aktywny (promiennik). Jest to jedyny element anteny Yagi, do którego bezpośrednio doprowadza się sygnał z nadajnika. Jego długość jest dostrojona do rezonansu na środku pasma pracy anteny. Reflektor (C) jest z tyłu, a direktory (B) z przodu."
     },
@@ -2550,6 +2565,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q111.png",
       "hint": "Elementy pasywne (bierne) w antenie Yagi umieszczone przed wibratorem nazywane są direktorami. Ich zadaniem jest \"skupianie\" energii w głównym kierunku promieniowania.",
       "explanation": "Element 3 to I direktor. Direktory (kierowniki) to elementy krótsze od wibratora, umieszczone przed nim. Powodują one zawężenie wiązki promieniowania i zwiększenie zysku energetycznego anteny w kierunku głównym. Wibrator (A) to element zasilany, a II direktor (C) to kolejny element kierujący."
     },
@@ -2573,6 +2589,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q112.png",
       "hint": "W wieloelementowej antenie Yagi może być kilka direktorów. Są one numerowane w kolejności od wibratora w stronę czoła anteny.",
       "explanation": "Element 4 to II direktor. Jest to drugi z kolei element kierujący, umieszczony za pierwszym direktorem (B). Każdy kolejny direktor jest zazwyczaj nieco krótszy od poprzedniego i przyczynia się do dalszego zwiększenia kierunkowości i zysku anteny. Wibrator (C) to element nr 2."
     },
@@ -3930,6 +3947,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q171.png",
       "hint": "Dioda prostuje sygnał w.cz., pozostawiając składową stałą i m.cz. (audio) oraz resztki w.cz. Kondensator C1 musi 'pozbyć się' tych resztek, nie wpływając na sygnał audio.",
       "explanation": "Kondensator C1 ma małą reaktancję dla prądów wielkiej częstotliwości (w.cz.) i dużą dla prądów małej częstotliwości (m.cz.). Dzięki temu skutecznie zwiera do masy pozostałości sygnału w.cz. po detekcji, jednocześnie nie tłumiąc użytecznego sygnału audio. Pełni więc rolę filtru. Odpowiedź A jest prawidłowa."
     },
@@ -4091,6 +4109,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q178.png",
       "hint": "W pętli PLL sygnał z generatora sterowanego napięciem (VCO) jest porównywany z wzorcem. Aby uzyskać różne częstotliwości wyjściowe, częstotliwość VCO jest najpierw odpowiednio modyfikowana w pętli sprzężenia zwrotnego.",
       "explanation": "W syntezerze częstotliwości opartym na PLL, blok 2 to dzielnik częstotliwości (często programowalny), który dzieli sygnał wyjściowy z VCO. Umożliwia to syntezę wielu częstotliwości wyjściowych przy użyciu jednego stabilnego wzorca, ponieważ pętla dąży do zrównania częstotliwości po podziale z częstotliwością wzorcową. Komparator fazy (A) porównuje sygnały, a generator wzorca (C) dostarcza stabilnej częstotliwości referencyjnej."
     },
@@ -4114,6 +4133,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q179.png",
       "hint": "Ten blok ma dwa wejścia: jedno z generatora wzorcowego i drugie z pętli sprzężenia zwrotnego (od dzielnika za VCO). Jego zadaniem jest porównanie obu sygnałów i wygenerowanie sygnału błędu.",
       "explanation": "Blok 3 to komparator fazy (detektor fazy), który jest sercem pętli PLL. Porównuje on fazę (a tym samym częstotliwość) sygnału z pętli sprzężenia zwrotnego z fazą sygnału wzorcowego. Na wyjściu generuje sygnał błędu, proporcjonalny do różnicy faz, który steruje resztą pętli. Dzielnik (A) i wzmacniacz błędu (C) to inne, osobne elementy pętli."
     },
@@ -4137,6 +4157,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q180.png",
       "hint": "Generator wzorcowy ma bardzo stabilną, ale często wysoką częstotliwość. Aby uzyskać pożądaną częstotliwość referencyjną do porównania w komparatorze fazy, jego sygnał może wymagać obróbki.",
       "explanation": "Blok 5 to dzielnik częstotliwości wzorca. Generator kwarcowy dostarcza bardzo stabilnej częstotliwości, ale często jest ona zbyt wysoka lub nieodpowiednia do bezpośredniego użycia w komparatorze fazy. Dzielnik ten redukuje częstotliwość wzorcową do pożądanej wartości referencyjnej (np. 10 kHz), z którą porównywany jest sygnał z głównej pętli."
     },
@@ -4160,6 +4181,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q181.png",
       "hint": "Sygnał wyjściowy z komparatora fazy jest często słaby i zawiera niepożądane składowe. Zanim zostanie użyty do sterowania generatorem VCO, musi zostać odpowiednio przefiltrowany i wzmocniony.",
       "explanation": "Blok 6 to wzmacniacz błędu, który pełni również rolę filtru dolnoprzepustowego. Wzmacnia on i filtruje sygnał błędu z komparatora fazy, przekształcając go w stabilne napięcie stałe (DC) sterujące generatorem VCO. Zapewnia to stabilność pętli i odfiltrowuje składowe zmienne, które mogłyby powodować niepożądaną modulację częstotliwości."
     },
@@ -4183,6 +4205,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q182.png",
       "hint": "W odbiorniku superheterodynowym, sygnał wejściowy o wysokiej częstotliwości jest przekształcany na stałą, niższą częstotliwość pośrednią. Jaki blok jest odpowiedzialny za tę \"przemianę częstotliwości\"?",
       "explanation": "Blok 2 to mieszacz (mixer), kluczowy element odbiornika superheterodynowego. Otrzymuje on sygnał wejściowy oraz sygnał z lokalnego generatora (heterodyny). Na jego wyjściu powstaje sygnał o częstotliwości równej różnicy (lub sumie) częstotliwości wejściowych, czyli sygnał pośredniej częstotliwości (p.cz.)."
     },
@@ -4206,6 +4229,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q183.png",
       "hint": "Po przemianie częstotliwości w mieszaczu, sygnał ma stałą częstotliwość pośrednią. To na tym etapie następuje główne wzmocnienie i selekcja sygnału.",
       "explanation": "Blok 3 to wzmacniacz pośredniej częstotliwości (p.cz.). Jego zadaniem jest silne wzmocnienie sygnału o stałej już częstotliwości oraz, dzięki zastosowanym filtrom, precyzyjne oddzielenie go od sygnałów z sąsiednich kanałów. To tutaj odbiornik zyskuje większość swojej czułości i selektywności."
     },
@@ -4229,6 +4253,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q184.png",
       "hint": "Po wzmocnieniu sygnału w torze p.cz., trzeba z niego wydobyć pierwotną informację (np. mowę, muzykę). Proces ten to demodulacja.",
       "explanation": "Blok 4 to detektor AM. Jego funkcją jest \"odczytanie\" obwiedni sygnału zmodulowanego amplitudowo i odtworzenie z niej oryginalnego sygnału małej częstotliwości (akustycznego). W najprostszej formie jest to dioda i filtr RC."
     },
@@ -4252,6 +4277,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q185.png",
       "hint": "Aby dokonać przemiany częstotliwości w mieszaczu, potrzebny jest drugi sygnał o precyzyjnie dobranej częstotliwości, generowany lokalnie w odbiorniku.",
       "explanation": "Blok 6 to heterodyna, czyli lokalny generator (oscylator). Wytwarza on sygnał o częstotliwości przesuniętej względem odbieranej fali o wartość częstotliwości pośredniej. Sygnał ten jest podawany na drugie wejście mieszacza, umożliwiając proces przemiany częstotliwości."
     },
@@ -4275,6 +4301,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q186.png",
       "hint": "W odbiorniku z podwójną przemianą, podobnie jak w pojedynczej, pierwszym krokiem po wzmocnieniu w.cz. jest zmiana częstotliwości sygnału.",
       "explanation": "Blok 2 to I mieszacz. Jest to pierwszy stopień konwersji częstotliwości, który zamienia sygnał z pasma radiowego na pierwszą, wyższą częstotliwość pośrednią. Użycie wysokiej pierwszej p.cz. (np. ok. 70 MHz) poprawia tłumienie częstotliwości lustrzanych."
     },
@@ -4298,6 +4325,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q187.png",
       "hint": "Po pierwszej przemianie częstotliwości sygnał trafia do stopnia, który go wzmacnia przed dalszym przetwarzaniem. Często stosuje się tu filtr typu 'roofing' w celu ochrony przed silnymi sygnałami.",
       "explanation": "Blok 3 to wzmacniacz I pośredniej częstotliwości. Wzmacnia on sygnał po pierwszej konwersji, zanim trafi on do drugiego mieszacza. W tym stopniu często stosuje się szeroki filtr (np. kwarcowy typu \"roofing filter\") w celu ochrony kolejnych stopni przed przesterowaniem silnymi sygnałami spoza pasma."
     },
@@ -4321,6 +4349,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q188.png",
       "hint": "To jest odbiornik z podwójną przemianą. Po pierwszym mieszaczu i wzmacniaczu sygnał przechodzi przez... drugi stopień przemiany.",
       "explanation": "Blok 4 to II mieszacz. Jego zadaniem jest konwersja sygnału z pierwszej częstotliwości pośredniej na drugą, zwykle znacznie niższą częstotliwość pośrednią (np. z 70 MHz na 455 kHz). Na tej niższej częstotliwości łatwiej jest zbudować bardzo selektywne filtry."
     },
@@ -4344,6 +4373,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q189.png",
       "hint": "Drugi mieszacz, podobnie jak pierwszy, potrzebuje sygnału z lokalnego generatora do działania. W przypadku drugiej przemiany, generator ten ma zazwyczaj stałą częstotliwość.",
       "explanation": "Blok 5 to II heterodyna stała. Jest to generator kwarcowy o stałej częstotliwości, dostarczający sygnał do drugiego mieszacza. Jego stabilność jest kluczowa, ale ponieważ nie jest przestrajany, łatwo jest osiągnąć wysoką jakość jego sygnału."
     },
@@ -4367,6 +4397,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q190.png",
       "hint": "Największą zaletą stosowania niskiej drugiej częstotliwości pośredniej jest możliwość zastosowania bardzo dobrych filtrów, które decydują o selektywności odbiornika dla różnych emisji.",
       "explanation": "Blok 6 to filtr przełączany II p.cz. To kluczowy element decydujący o selektywności odbiornika. Zazwyczaj jest to zestaw filtrów o różnej szerokości pasma (np. wąski dla CW, szerszy dla SSB, najszerszy dla AM), które operator może przełączać w zależności od odbieranej emisji."
     },
@@ -4390,6 +4421,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q191.png",
       "hint": "Po przejściu przez wąskopasmowy filtr, sygnał jest już bardzo słaby. Musi zostać ponownie wzmocniony przed detekcją.",
       "explanation": "Blok 7 to wzmacniacz II pośredniej częstotliwości. Jest to główny stopień wzmacniający odbiornika, działający na drugiej (niskiej) p.cz. To tutaj sygnał osiąga poziom niezbędny do prawidłowego działania detektora, a także układów automatycznej regulacji wzmocnienia (ARW)."
     },
@@ -4413,6 +4445,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q192.png",
       "hint": "Ostatni krok w torze radiowym: odzyskanie informacji z sygnału p.cz. Dla różnych emisji (AM, CW, SSB) proces ten wygląda nieco inaczej i często wymaga dodatkowego sygnału.",
       "explanation": "Blok 8 to detektor AM, CW, SSB. Jest to uniwersalny stopień demodulacji. Dla AM działa jak detektor obwiedni. Dla SSB i CW działa jako mieszacz produktowy, mieszając sygnał p.cz. z sygnałem z generatora BFO, co pozwala odtworzyć sygnał akustyczny."
     },
@@ -4436,6 +4469,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q193.png",
       "hint": "Aby usłyszeć sygnały telegraficzne (CW) lub jednowstęgowe (SSB), potrzebny jest dodatkowy, lokalnie generowany sygnał nośnej, który jest wprowadzany w detektorze.",
       "explanation": "Blok 10 to BFO (Beat Frequency Oscillator). Jest to generator pomocniczy, który wytwarza sygnał o częstotliwości zbliżonej do drugiej częstotliwości pośredniej. Mieszanie tych dwóch sygnałów w detektorze produktowym powoduje powstanie słyszalnego tonu dla CW lub odtworzenie mowy dla SSB."
     },
@@ -4459,6 +4493,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q194.png",
       "hint": "W odbiorniku superheterodynowym, aby zmieniać odbieraną częstotliwość, stroi się generator lokalny współpracujący z pierwszym mieszaczem.",
       "explanation": "Blok 11 to I heterodyna strojona (często nazywana VFO - Variable Frequency Oscillator). To jest główny oscylator, którym operator stroi odbiornik w celu wybrania żądanej stacji. Jego stabilność i precyzja decydują o stabilności całego odbiornika."
     },
@@ -4482,6 +4517,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q195.png",
       "hint": "W odbiorniku o bezpośredniej przemianie (homodynie) częstotliwość sygnału RF jest od razu zamieniana na częstotliwość akustyczną. Jaki element dokonuje tej przemiany i jaka jego cecha jest pożądana, by uniknąć problemów z przenikaniem sygnału heterodyny?",
       "explanation": "Blok 2 to mieszacz zrównoważony. W odbiorniku homodynowym heterodyna pracuje na częstotliwości odbieranego sygnału, więc kluczowe jest, aby sygnał heterodyny nie przedostawał się na wyjście. Mieszacz zrównoważony (lub podwójnie zrównoważony) tłumi sygnał heterodyny i sygnał RF na wyjściu, przepuszczając tylko pożądany produkt mieszania."
     },
@@ -4505,6 +4541,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q196.png",
       "hint": "Po demodulacji w mieszaczu, sygnał ma już postać sygnału akustycznego. Co jest następnym krokiem, aby można go było usłyszeć w głośniku lub słuchawkach?",
       "explanation": "Blok 3 to wzmacniacz akustyczny (m.cz.). Sygnał na wyjściu mieszacza i filtrów dolnoprzepustowych jest sygnałem audio o bardzo niskim poziomie. Wzmacniacz akustyczny podnosi jego poziom na tyle, by mógł wysterować słuchawki lub głośnik."
     },
@@ -4528,6 +4565,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q197.png",
       "hint": "Kluczowy element odbiornika o bezpośredniej przemianie, który musi być bardzo stabilny i pracować dokładnie na częstotliwości odbieranego sygnału.",
       "explanation": "Blok 4 to heterodyna (VFO). W odbiorniku homodynowym ten generator musi pracować na częstotliwości odbieranego sygnału. W przeciwieństwie do superheterodyny, gdzie błąd częstotliwości heterodyny tylko przesuwa częstotliwość pośrednią, tutaj błąd bezpośrednio wpływa na wysokość tonu odbieranego sygnału."
     },
@@ -4551,6 +4589,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q198.png",
       "hint": "Sygnał z anteny na pasmach UKF jest bardzo słaby. Jaki jest pierwszy blok w torze odbiornika, mający na celu jego wzmocnienie, zanim trafi do mieszacza?",
       "explanation": "Blok 1 to wzmacniacz wielkiej częstotliwości (w.cz.), często nazywany przedwzmacniaczem. Jego zadaniem jest wzmocnienie słabego sygnału z anteny, aby poprawić ogólny współczynnik szumów odbiornika. Jest to szczególnie ważne na pasmach VHF i UHF, takich jak 144 MHz."
     },
@@ -4574,6 +4613,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q199.png",
       "hint": "Po pierwszej przemianie na 10.7 MHz, sygnał jest na stałej częstotliwości pośredniej. Kolejnym krokiem jest jego wzmocnienie i filtrowanie.",
       "explanation": "Blok 3 to wzmacniacz I pośredniej częstotliwości 10,7 MHz. W tym stopniu następuje główne wzmocnienie i wstępna filtracja sygnału. Częstotliwość 10,7 MHz jest standardową pierwszą p.cz. w odbiornikach FM UKF, a zastosowanie odpowiednich filtrów w tym bloku poprawia selektywność."
     },
@@ -4597,6 +4637,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q200.png",
       "hint": "W odbiorniku z podwójną przemianą, sygnał z pierwszej p.cz. (10.7 MHz) jest ponownie mieszany w celu uzyskania drugiej, niższej p.cz. (zwykle 455 kHz).",
       "explanation": "Blok 4 to II mieszacz. Dokonuje on drugiej przemiany częstotliwości, mieszając sygnał 10,7 MHz z sygnałem z drugiej heterodyny, aby uzyskać drugą p.cz. (np. 455 kHz). Na tej niższej częstotliwości stosuje się precyzyjne filtry ceramiczne, które określają ostateczną szerokość kanału FM, co jest trudne do osiągnięcia przy 10.7 MHz."
     },
@@ -4620,6 +4661,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q201.png",
       "hint": "W odbiorniku z podwójną przemianą częstotliwości sygnał po drugim mieszaczu ma drugą częstotliwość pośrednią (p.cz.). Zanim zostanie zdemodulowany, musi być odpowiednio wzmocniony.",
       "explanation": "Blok 5 znajduje się w torze sygnałowym po drugim mieszaczu, a przed detektorem. Jego zadaniem jest wzmocnienie sygnału o drugiej częstotliwości pośredniej, która w typowych konstrukcjach wynosi 455 kHz. Heterodyna (A) generuje sygnał dla mieszacza, a detektor (C) jest kolejnym stopniem, służącym do odzyskania sygnału audio z fali nośnej."
     },
@@ -4643,6 +4685,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q202.png",
       "hint": "Jaki blok jest niezbędny do odzyskania sygnału m.cz. (informacji) z sygnału zmodulowanego częstotliwościowo (FM)?",
       "explanation": "Blok 6 to ostatni element toru pośredniej częstotliwości. Jego zadaniem jest demodulacja, czyli wydzielenie sygnału audio (m.cz.) z sygnału o częstotliwości pośredniej zmodulowanego częstotliwościowo. Dlatego jest to detektor FM. Wzmacniacz akustyczny (B) znajduje się za detektorem, a heterodyna (C) znacznie wcześniej w torze odbiornika."
     },
@@ -4666,6 +4709,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q203.png",
       "hint": "Po demodulacji sygnału audio, jest on zwykle zbyt słaby, aby bezpośrednio sterować głośnikiem. Jaki blok odpowiada za zwiększenie jego mocy?",
       "explanation": "Blok 7 znajduje się tuż za detektorem FM, a przed głośnikiem. Sygnał audio z detektora ma bardzo małą moc, dlatego musi zostać wzmocniony przez wzmacniacz akustyczny (wzmacniacz m.cz.), aby mógł wysterować głośnik. Wzmacniacz p.cz. (A) i detektor FM (C) znajdują się wcześniej w torze odbiorczym."
     },
@@ -4689,6 +4733,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q204.png",
       "hint": "Ten blok odpowiada za wyciszenie głośnika, gdy na wejściu odbiornika nie ma użytecznego sygnału, a słychać jedynie szum. Jak nazywa się ta funkcja?",
       "explanation": "Blok 8 to blokada szumów (ang. squelch). Analizuje ona poziom sygnału (lub szumu) i automatycznie wycisza wzmacniacz audio, gdy odbierany sygnał jest zbyt słaby, co eliminuje nieprzyjemny szum w głośniku. Wzmacniacz akustyczny (A) i detektor FM (C) to inne, fundamentalne części odbiornika, ale nie pełnią tej funkcji."
     },
@@ -4712,6 +4757,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q205.png",
       "hint": "W odbiorniku z podwójną przemianą potrzebne są dwa oscylatory lokalne (heterodyny) do zrealizowania dwóch etapów mieszania sygnału. Ten blok to drugi z nich.",
       "explanation": "Blok 9 to II heterodyna, która generuje sygnał o stałej częstotliwości. Sygnał ten jest podawany do drugiego mieszacza, aby dokonać drugiej przemiany częstotliwości (np. z 10.7 MHz na 455 kHz). Wzmacniacz akustyczny (A) i blokada szumów (B) to elementy toru audio, a nie toru radiowego."
     },
@@ -4735,6 +4781,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q206.png",
       "hint": "To jest pierwszy oscylator w torze odbiornika, który wraz z pierwszym mieszaczem dokonuje pierwszej przemiany częstotliwości. Jego częstotliwość określa, jaki kanał jest odbierany.",
       "explanation": "Blok 10 to I heterodyna. W odbiornikach kanałowych, stabilizowanych kwarcem, jest to często generator, którego częstotliwość jest przełączana w celu zmiany odbieranego kanału. Jego sygnał jest mieszany z sygnałem z anteny w pierwszym mieszaczu. Wzmacniacz akustyczny (B) i detektor FM (C) znajdują się znacznie dalej w torze odbiornika."
     },
@@ -4781,6 +4828,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q208.png",
       "hint": "Każdy nadajnik musi posiadać źródło sygnału o określonej częstotliwości. Jak nazywa się blok, który generuje ten podstawowy sygnał?",
       "explanation": "Blok 1 to oscylator (generator), często o zmiennej częstotliwości (VFO - Variable Frequency Oscillator), który generuje sygnał o częstotliwości, na której będziemy nadawać. To serce nadajnika, decydujące o jego częstotliwości pracy. Separator (A) i wzmacniacz mocy (B) to kolejne stopnie, które obrabiają i wzmacniają sygnał z oscylatora."
     },
@@ -4804,6 +4852,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q209.png",
       "hint": "Ten blok umieszcza się pomiędzy czułym oscylatorem a kolejnymi stopniami. Jego zadaniem jest zapobieganie wpływowi zmian obciążenia na stabilność częstotliwości oscylatora.",
       "explanation": "Blok 2 to separator (lub inaczej stopień buforowy). Jest to wzmacniacz o dużym wzmocnieniu napięciowym, ale małej mocy, który izoluje oscylator (VFO) od kolejnych stopni nadajnika. Zapewnia to stabilną pracę oscylatora, niezależnie od zmian zachodzących w dalszej części toru nadawczego (np. podczas kluczowania). VFO (B) jest przed nim, a wzmacniacz mocy (A) - za nim."
     },
@@ -4827,6 +4876,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q210.png",
       "hint": "To ostatni stopień w torze nadajnika, odpowiedzialny za wzmocnienie sygnału do pożadanego poziomu mocy, który następnie jest wypromieniowywany przez antenę.",
       "explanation": "Blok 3 to wzmacniacz mocy (PA - Power Amplifier). Jego zadaniem jest wzmocnienie sygnału z poprzednich stopni do wymaganego poziomu mocy wyjściowej. Jest to stopień, który pobiera najwięcej mocy ze źródła zasilania. Oscylator (A) generuje sygnał, a filtr wyjściowy (C) znajduje się za wzmacniaczem mocy, dopasowując go do anteny i tłumiąc harmoniczne."
     },
@@ -4850,6 +4900,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q211.png",
       "hint": "W nadajnikach wielopasmowych, aby zapewnić stabilność, często używa się jednego oscylatora kwarcowego. Aby uzyskać sygnał na różnych pasmach, jego częstotliwość jest powielana. Jaki blok umieszcza się między oscylatorem a powielaczem?",
       "explanation": "Blok 2 to separator, który pełni taką samą funkcję jak w nadajniku jednopasmowym: izoluje oscylator od kolejnych stopni, zapewniając jego stabilną pracę. Jest to kluczowe, zwłaszcza w układach z powielaniem częstotliwości, gdzie jakiekolwiek niestabilności oscylatora bazowego zostałyby również powielone. Wzmacniacz sterujący (A) i powielacz (C) są dalszymi elementami toru nadawczego."
     },
@@ -4873,6 +4924,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q212.png",
       "hint": "Po zmieszaniu sygnału z VFO i wzbudnicy SSB powstaje sygnał na docelowej częstotliwości. Jaki element jest potrzebny, aby przepuścić tylko sygnały z pożądanych pasm (3,5 i 14 MHz), a stłumić inne produkty mieszania?",
       "explanation": "Blok 3 to filtr pasmowy, który selekcjonuje pożądane częstotliwości wyjściowe (w tym przypadku 3.5 MHz i 14 MHz) powstałe w mieszaczu. Mieszacz produkuje sumę i różnicę częstotliwości wejściowych, a filtr jest niezbędny, by na dalsze stopnie trafił tylko właściwy sygnał. VFO (C) dostarcza sygnał do mieszacza, a wzmacniacz mocy (B) jest znacznie dalej."
     },
@@ -4896,6 +4948,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q213.png",
       "hint": "Sygnał po filtrze pasmowym jest jeszcze zbyt słaby, aby wysterować końcowy wzmacniacz mocy. Potrzebny jest stopień pośredni, który go wzmocni.",
       "explanation": "Blok 4 to wzmacniacz sterujący (driver). Jego zadaniem jest wzmocnienie sygnału z filtra pasmowego do poziomu wystarczającego do prawidłowego wysterowania końcowego wzmacniacza mocy (PA). Zapewnia on odpowiednie dopasowanie i poziom sygnału między stopniami o małej i dużej mocy. Filtr wyjściowy (B) jest na samym końcu, a wzbudnica (C) na początku toru."
     },
@@ -4919,6 +4972,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q214.png",
       "hint": "To ostatni aktywny blok w torze nadawczym. Jego zadaniem jest wzmocnienie sygnału do ostatecznej, wysokiej mocy przeznaczonej do wypromieniowania przez antenę.",
       "explanation": "Blok 5 to wzmacniacz mocy (PA - Power Amplifier). Jest to końcowy stopień nadajnika, który dostarcza sygnał o dużej mocy do filtra wyjściowego i anteny. Mieszacz (B) i oscylator VFO (C) znajdują się na wcześniejszych etapach formowania sygnału."
     },
@@ -4942,6 +4996,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q215.png",
       "hint": "Po wzmocnieniu w stopniu końcowym, sygnał radiowy może zawierać niepożądane częstotliwości harmoniczne. Jaki element umieszcza się między wzmacniaczem mocy a anteną, aby je usunąć?",
       "explanation": "Blok 6 to filtr wyjściowy, zazwyczaj dolnoprzepustowy. Jego dwie główne funkcje to dopasowanie impedancji wzmacniacza mocy do impedancji linii transmisyjnej i anteny oraz stłumienie niepożądanych częstotliwości harmonicznych, które mogłyby zakłócać inne pasma. Wzmacniacz mocy (A) jest przed filtrem, a mieszacz (C) znacznie wcześniej."
     },
@@ -4965,6 +5020,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q216.png",
       "hint": "Ten blok generuje sygnał o zmiennej częstotliwości, który po zmieszaniu z sygnałem ze wzbudnicy pozwala na przestrojenie nadajnika w obrębie danego pasma. Skrót VFO pochodzi od jego angielskiej nazwy.",
       "explanation": "Blok 7 to oscylator VFO (Variable Frequency Oscillator). W tym układzie generuje on sygnał w zakresie 5-5.5 MHz, który jest mieszany z sygnałem 9 MHz ze wzbudnicy. Zmiana częstotliwości VFO pozwala na płynne przestrojenie nadajnika w paśmie 3.5 MHz (9 - 5.5 = 3.5, 9 - 5 = 4) lub 14 MHz (9 + 5 = 14, 9 + 5.5 = 14.5). Filtry (B, C) kształtują widmo sygnału w innych miejscach toru."
     },
@@ -9195,6 +9251,7 @@
       ],
       "correctAnswerLetter": "A",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q402.png",
       "hint": "Kondensator C1 jest podłączony równolegle do rezystora w emiterze tranzystora. Pomyśl, jak kondensator zachowuje się dla prądów zmiennych i jak to wpływa na impedancję w obwodzie emitera.",
       "explanation": "Kondensator C1 tworzy bocznik (bypass) dla sygnałów zmiennych, zwierając rezystor emiterowy dla tych sygnałów. Skutecznie usuwa to ujemne sprzężenie zwrotne dla składowej zmiennej, co prowadzi do znacznego zwiększenia wzmocnienia wzmacniacza dla prądów zmiennych. Rezystor emiterowy nadal stabilizuje punkt pracy dla prądu stałego, ale jego wpływ na wzmocnienie AC jest niwelowany przez kondensator."
     },
@@ -9379,6 +9436,7 @@
       ],
       "correctAnswerLetter": "C",
       "section": "Radiotechnika",
+      "imageUrl": "/images/questions/Q410.png",
       "hint": "Rezystory R1 i R2 tworzą klasyczny układ dzielnika napięcia. Jaka jest jego podstawowa funkcja w kontekście polaryzacji bazy tranzystora?",
       "explanation": "Rezystory R1 i R2 tworzą dzielnik napięcia, który podaje stałe, określone napięcie na bazę tranzystora. To napięcie, wraz z rezystorem w emiterze, ustala prąd spoczynkowy bazy i kolektora, czyli definiuje punkt pracy tranzystora. Jest to kluczowe dla zapewnienia prawidłowego wzmocnienia sygnału bez zniekształceń."
     },
@@ -10982,7 +11040,7 @@
     }
   ],
   "metadata": {
-    "fetchedAt": "2026-02-01T14:12:38.938Z",
+    "fetchedAt": "2026-02-02T17:13:10.984Z",
     "source": "https://egzaminkf.pl",
     "totalQuestions": 480,
     "questionsBySection": {

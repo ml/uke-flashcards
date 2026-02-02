@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense, useState, useEffect, useMemo, useCallback } from 'react';
+import { Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Question, Section } from '@/types/questions';
 import { useHints } from '@/components/HintsContext';
+import { StudyProgress } from '@/components/StudyProgress';
 
 interface AttemptResponse {
   id: number;
@@ -24,6 +25,29 @@ interface SessionData {
   totalQuestions: number;
 }
 
+interface SmartStudyStats {
+  total: number;
+  unseen: number;
+  weak: number;
+  learning: number;
+  strong: number;
+  mastered: number;
+  seenCount: number;
+  seenPercentage: number;
+}
+
+interface RecentAnswer {
+  questionId: string;
+  answeredAt: number;
+}
+
+interface StudySessionState {
+  shuffledOrder: string;
+  currentIndex: number;
+  recentAnswers: RecentAnswer[];
+  section: string | null;
+}
+
 const ALL_SECTIONS: Section[] = [
   'Radiotechnika',
   'Przepisy',
@@ -31,39 +55,78 @@ const ALL_SECTIONS: Section[] = [
   'Procedury operatorskie',
 ];
 
+const STORAGE_KEY = 'uke-study-session-state';
+
+function loadSessionState(): StudySessionState | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {
+    // Ignore errors
+  }
+  return null;
+}
+
+function saveSessionState(state: StudySessionState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Ignore errors
+  }
+}
+
+function clearSessionState(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore errors
+  }
+}
+
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { hintsEnabled, isHydrated } = useHints();
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [attemptResult, setAttemptResult] = useState<AttemptResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingNext, setLoadingNext] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Session mode state
+  // Smart study state
+  const [phase, setPhase] = useState<'coverage' | 'drilling' | 'mastered'>('coverage');
+  const [stats, setStats] = useState<SmartStudyStats | null>(null);
+  const [shuffledOrder, setShuffledOrder] = useState<string>('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [recentAnswers, setRecentAnswers] = useState<RecentAnswer[]>([]);
+
+  // Session mode state (20-question exam simulation)
   const [sessionMode, setSessionMode] = useState(false);
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
+  const [sessionIndex, setSessionIndex] = useState(0);
   const [sessionCompleted, setSessionCompleted] = useState(false);
   const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
   const [startingSession, setStartingSession] = useState(false);
 
+  // Track if initial load is done
+  const initialLoadDone = useRef(false);
+
   // Get selected section from URL params
   const selectedSection = searchParams.get('section') as Section | null;
 
-  // Filter questions by section
-  const questions = useMemo(() => {
-    if (sessionMode && sessionData) {
-      return sessionData.questions;
-    }
-    if (!selectedSection) {
-      return allQuestions;
-    }
-    return allQuestions.filter((q) => q.section === selectedSection);
-  }, [allQuestions, selectedSection, sessionMode, sessionData]);
+  // Session mode questions
+  const sessionQuestions = sessionMode && sessionData ? sessionData.questions : [];
+  const sessionQuestion = sessionQuestions[sessionIndex] || null;
 
+  // Load questions on mount
   useEffect(() => {
     async function loadQuestions() {
       try {
@@ -82,14 +145,102 @@ function StudyContent() {
     loadQuestions();
   }, []);
 
-  // Reset index when section changes (only in non-session mode)
+  // Load next smart question
+  const loadNextQuestion = useCallback(
+    async (forceSection?: Section | null, resetSession?: boolean) => {
+      if (sessionMode) return;
+
+      setLoadingNext(true);
+      try {
+        const section = forceSection !== undefined ? forceSection : selectedSection;
+
+        // Build query params
+        const params = new URLSearchParams();
+        if (section) {
+          params.set('section', section);
+        }
+
+        // Get state from localStorage or current state
+        let sessionState = resetSession ? null : loadSessionState();
+
+        // If section changed, clear session state
+        if (sessionState && sessionState.section !== (section || null)) {
+          clearSessionState();
+          sessionState = null;
+        }
+
+        if (sessionState && !resetSession) {
+          if (sessionState.shuffledOrder) {
+            params.set('shuffledOrder', sessionState.shuffledOrder);
+          }
+          if (sessionState.currentIndex !== undefined) {
+            params.set('currentIndex', sessionState.currentIndex.toString());
+          }
+          if (sessionState.recentAnswers && sessionState.recentAnswers.length > 0) {
+            params.set('recentTimestamps', JSON.stringify(sessionState.recentAnswers));
+          }
+        } else if (recentAnswers.length > 0 && !resetSession) {
+          params.set('recentTimestamps', JSON.stringify(recentAnswers));
+        }
+
+        const response = await fetch(`/api/questions/next?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to load next question');
+        }
+
+        const data = await response.json();
+
+        if (data.question) {
+          setCurrentQuestion(data.question);
+        } else {
+          setCurrentQuestion(null);
+        }
+
+        setPhase(data.phase || 'coverage');
+        setStats(data.stats || null);
+
+        // Update local state from response
+        if (data.shuffledOrder) {
+          setShuffledOrder(data.shuffledOrder);
+        }
+        if (data.currentIndex !== undefined) {
+          setCurrentIndex(data.currentIndex);
+        }
+
+        // Save state to localStorage
+        if (data.shuffledOrder || data.currentIndex !== undefined) {
+          saveSessionState({
+            shuffledOrder: data.shuffledOrder || shuffledOrder,
+            currentIndex: data.currentIndex ?? currentIndex,
+            recentAnswers: recentAnswers,
+            section: section || null,
+          });
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load question');
+      } finally {
+        setLoadingNext(false);
+      }
+    },
+    [selectedSection, sessionMode, recentAnswers, shuffledOrder, currentIndex]
+  );
+
+  // Initial load of first question (after questions are loaded)
   useEffect(() => {
-    if (!sessionMode) {
-      setCurrentIndex(0);
-      setSelectedAnswer(null);
-      setAttemptResult(null);
+    if (!loading && allQuestions.length > 0 && !sessionMode && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      loadNextQuestion();
     }
-  }, [selectedSection, sessionMode]);
+  }, [loading, allQuestions.length, sessionMode, loadNextQuestion]);
+
+  // Reload when section changes (only in non-session mode)
+  useEffect(() => {
+    if (!sessionMode && initialLoadDone.current && !loading) {
+      // Section changed - reload with new section
+      loadNextQuestion(selectedSection, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSection]);
 
   const handleSectionChange = useCallback(
     (section: string) => {
@@ -103,6 +254,14 @@ function StudyContent() {
     },
     [router, searchParams]
   );
+
+  const handleReset = useCallback(() => {
+    clearSessionState();
+    setRecentAnswers([]);
+    setShuffledOrder('');
+    setCurrentIndex(0);
+    loadNextQuestion(selectedSection, true);
+  }, [loadNextQuestion, selectedSection]);
 
   async function handleStartSession() {
     setStartingSession(true);
@@ -122,7 +281,7 @@ function StudyContent() {
       const data: SessionData = await response.json();
       setSessionData(data);
       setSessionMode(true);
-      setCurrentIndex(0);
+      setSessionIndex(0);
       setSelectedAnswer(null);
       setAttemptResult(null);
       setSessionCompleted(false);
@@ -163,16 +322,18 @@ function StudyContent() {
     setSessionData(null);
     setSessionCompleted(false);
     setSessionStats(null);
-    setCurrentIndex(0);
+    setSessionIndex(0);
     setSelectedAnswer(null);
     setAttemptResult(null);
+    // Reload smart study mode
+    loadNextQuestion();
   }
 
-  const currentQuestion = questions[currentIndex];
+  const displayQuestion = sessionMode ? sessionQuestion : currentQuestion;
 
   async function handleAnswerClick(answerLetter: string) {
-    if (selectedAnswer !== null) {
-      return; // Already answered
+    if (selectedAnswer !== null || !displayQuestion) {
+      return;
     }
 
     setSelectedAnswer(answerLetter);
@@ -182,7 +343,7 @@ function StudyContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          questionId: currentQuestion.id,
+          questionId: displayQuestion.id,
           selectedAnswer: answerLetter,
           sessionId: sessionData?.sessionId ?? null,
         }),
@@ -194,28 +355,53 @@ function StudyContent() {
 
       const result: AttemptResponse = await response.json();
       setAttemptResult(result);
+
+      // Track recent answer for cooling period (only in study mode)
+      if (!sessionMode) {
+        const newRecentAnswer: RecentAnswer = {
+          questionId: displayQuestion.id,
+          answeredAt: Date.now(),
+        };
+        const updatedRecent = [...recentAnswers, newRecentAnswer].slice(-20); // Keep last 20
+        setRecentAnswers(updatedRecent);
+
+        // Update localStorage
+        const currentState = loadSessionState();
+        if (currentState) {
+          saveSessionState({
+            ...currentState,
+            recentAnswers: updatedRecent,
+          });
+        }
+      }
     } catch (err) {
       console.error('Error recording attempt:', err);
     }
   }
 
   function handleNextQuestion() {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (sessionMode) {
+      if (sessionIndex < sessionQuestions.length - 1) {
+        setSessionIndex(sessionIndex + 1);
+        setSelectedAnswer(null);
+        setAttemptResult(null);
+      } else if (!sessionCompleted) {
+        handleCompleteSession();
+      }
+    } else {
+      // Smart study mode - load next question
       setSelectedAnswer(null);
       setAttemptResult(null);
-    } else if (sessionMode && !sessionCompleted) {
-      // Last question in session, complete it
-      handleCompleteSession();
+      loadNextQuestion();
     }
   }
 
-  function handlePreviousQuestion() {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setSelectedAnswer(null);
-      setAttemptResult(null);
-    }
+  function handleSkipQuestion() {
+    if (sessionMode) return;
+    // Skip without recording - just load next
+    setSelectedAnswer(null);
+    setAttemptResult(null);
+    loadNextQuestion();
   }
 
   function getAnswerButtonClass(answerLetter: string): string {
@@ -226,7 +412,6 @@ function StudyContent() {
       return `${baseClass} border-slate-200 bg-white hover:border-blue-400 hover:bg-blue-50 cursor-pointer`;
     }
 
-    // After answering
     if (answerLetter === attemptResult?.correctAnswer) {
       return `${baseClass} border-green-500 bg-green-50 text-green-800`;
     }
@@ -267,7 +452,6 @@ function StudyContent() {
             Session Complete!
           </h2>
 
-          {/* Overall score */}
           <div
             className={`text-center p-6 rounded-lg mb-6 ${
               passed ? 'bg-green-100' : 'bg-red-100'
@@ -286,7 +470,6 @@ function StudyContent() {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-green-50 p-4 rounded-lg text-center">
               <div className="text-3xl font-bold text-green-700">
@@ -302,14 +485,13 @@ function StudyContent() {
             </div>
           </div>
 
-          {/* Section breakdown */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-slate-700 mb-3">
               By Section
             </h3>
             <div className="space-y-2">
-              {Object.entries(sessionStats.bySection).map(([section, stats]) => {
-                const sectionRate = stats.correct / stats.total;
+              {Object.entries(sessionStats.bySection).map(([section, sectionData]) => {
+                const sectionRate = sectionData.correct / sectionData.total;
                 return (
                   <div
                     key={section}
@@ -323,7 +505,7 @@ function StudyContent() {
                           : 'text-red-600'
                       }`}
                     >
-                      {stats.correct} / {stats.total} (
+                      {sectionData.correct} / {sectionData.total} (
                       {Math.round(sectionRate * 100)}%)
                     </span>
                   </div>
@@ -332,7 +514,6 @@ function StudyContent() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-center gap-4">
             <button
               onClick={handleStartSession}
@@ -353,10 +534,58 @@ function StudyContent() {
     );
   }
 
-  if (questions.length === 0) {
+  // Mastery complete view (study mode)
+  if (!sessionMode && phase === 'mastered') {
     return (
       <div className="space-y-6">
         {/* Section filter */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <label htmlFor="section-filter" className="text-sm font-medium text-slate-700">
+              Section:
+            </label>
+            <select
+              id="section-filter"
+              value={selectedSection || ''}
+              onChange={(e) => handleSectionChange(e.target.value)}
+              className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">All sections</option>
+              {ALL_SECTIONS.map((section) => (
+                <option key={section} value={section}>
+                  {section}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {stats && <StudyProgress phase={phase} stats={stats} onReset={handleReset} />}
+
+        <div className="bg-white rounded-xl shadow-md p-8 text-center">
+          <div className="text-6xl mb-4">🏆</div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">
+            All Questions Mastered!
+          </h2>
+          <p className="text-slate-600 mb-6">
+            Congratulations! You've mastered all{' '}
+            {selectedSection ? `${selectedSection} ` : ''}questions.
+          </p>
+          <button
+            onClick={handleReset}
+            className="px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+          >
+            Start Fresh
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No question available
+  if (!displayQuestion) {
+    return (
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <label htmlFor="section-filter" className="text-sm font-medium text-slate-700">
@@ -379,7 +608,9 @@ function StudyContent() {
         </div>
 
         <div className="flex items-center justify-center py-12">
-          <div className="text-slate-600">No questions available for this section</div>
+          <div className="text-slate-600">
+            {loadingNext ? 'Loading question...' : 'No questions available'}
+          </div>
         </div>
       </div>
     );
@@ -432,35 +663,60 @@ function StudyContent() {
         )}
       </div>
 
+      {/* Study Progress (only in study mode) */}
+      {!sessionMode && stats && (
+        <StudyProgress phase={phase} stats={stats} onReset={handleReset} />
+      )}
+
       {/* Progress indicator */}
       <div className="flex items-center justify-between text-sm text-slate-600">
         <span className="bg-slate-200 px-3 py-1 rounded-full">
-          {currentQuestion.section}
+          {displayQuestion.section}
         </span>
-        <span className="font-medium">
-          {currentIndex + 1} / {questions.length}
-        </span>
+        {sessionMode ? (
+          <span className="font-medium">
+            {sessionIndex + 1} / {sessionQuestions.length}
+          </span>
+        ) : (
+          <span className="font-medium text-slate-500">
+            Smart Selection
+          </span>
+        )}
       </div>
 
       {/* Question card */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="mb-6">
           <span className="text-sm text-slate-500 mb-2 block">
-            Question {currentQuestion.number}
+            Question {displayQuestion.number}
           </span>
           <h2 className="text-xl font-semibold text-slate-800">
-            {currentQuestion.text}
+            {displayQuestion.text}
           </h2>
+          {/* Question diagram image */}
+          {displayQuestion.imageUrl && (
+            <div className="mt-4 flex justify-center">
+              <img
+                src={displayQuestion.imageUrl}
+                alt={`Diagram for question ${displayQuestion.number}`}
+                className="max-w-full h-auto rounded-lg border border-slate-200 shadow-sm"
+                style={{ maxHeight: '400px' }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Hint (shown when enabled and not yet answered) */}
-        {isHydrated && hintsEnabled && currentQuestion.hint && selectedAnswer === null && (
+        {isHydrated && hintsEnabled && displayQuestion.hint && selectedAnswer === null && (
           <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex items-start gap-2">
-              <span className="text-amber-600 text-lg">&#128161;</span>
+              <span className="text-amber-600 text-lg">💡</span>
               <div>
                 <span className="text-sm font-medium text-amber-800">Hint:</span>
-                <p className="text-amber-700 mt-1">{currentQuestion.hint}</p>
+                <p className="text-amber-700 mt-1">{displayQuestion.hint}</p>
               </div>
             </div>
           </div>
@@ -468,7 +724,7 @@ function StudyContent() {
 
         {/* Answers */}
         <div className="space-y-3">
-          {currentQuestion.answers.map((answer) => (
+          {displayQuestion.answers.map((answer) => (
             <button
               key={answer.letter}
               onClick={() => handleAnswerClick(answer.letter)}
@@ -496,15 +752,14 @@ function StudyContent() {
                 : `Incorrect. The correct answer is ${attemptResult.correctAnswer}.`}
             </p>
 
-            {/* Explanation (always shown after answering) */}
-            {currentQuestion.explanation && (
+            {displayQuestion.explanation && (
               <div className={`mt-3 pt-3 border-t ${
                 attemptResult.isCorrect
                   ? 'border-green-200'
                   : 'border-red-200'
               }`}>
                 <span className="font-medium">Explanation:</span>
-                <p className="mt-1">{currentQuestion.explanation}</p>
+                <p className="mt-1">{displayQuestion.explanation}</p>
               </div>
             )}
           </div>
@@ -513,39 +768,43 @@ function StudyContent() {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        {!sessionMode && (
+        {!sessionMode && selectedAnswer === null && (
           <button
-            onClick={handlePreviousQuestion}
-            disabled={currentIndex === 0}
-            className="px-6 py-2 rounded-lg bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleSkipQuestion}
+            disabled={loadingNext}
+            className="px-6 py-2 rounded-lg bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition-colors disabled:opacity-50"
           >
-            Previous
+            Skip
           </button>
         )}
 
-        {sessionMode && <div />}
+        {(sessionMode || selectedAnswer !== null) && <div />}
 
-        {selectedAnswer !== null && currentIndex < questions.length - 1 && (
-          <button
-            onClick={handleNextQuestion}
-            className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
-          >
-            Next
-          </button>
-        )}
-
-        {selectedAnswer !== null && currentIndex === questions.length - 1 && (
+        {selectedAnswer !== null && (
           sessionMode ? (
+            sessionIndex < sessionQuestions.length - 1 ? (
+              <button
+                onClick={handleNextQuestion}
+                className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleNextQuestion}
+                className="px-6 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
+              >
+                Finish Session
+              </button>
+            )
+          ) : (
             <button
               onClick={handleNextQuestion}
-              className="px-6 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
+              disabled={loadingNext}
+              className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              Finish Session
+              {loadingNext ? 'Loading...' : 'Next Question'}
             </button>
-          ) : (
-            <div className="text-slate-600 font-medium py-2">
-              You've reached the last question!
-            </div>
           )
         )}
       </div>
