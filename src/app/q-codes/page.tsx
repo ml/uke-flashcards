@@ -1,20 +1,79 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { QCode } from '@/types/qcodes';
 import { useHints } from '@/components/HintsContext';
 
 interface QCodeStats {
   total: number;
-  mastered: number;
-  learning: number;
   unseen: number;
+  weak: number;
+  learning: number;
+  strong: number;
+  mastered: number;
 }
 
 interface QCodeResponse {
   qCode: QCode | null;
   phase: 'coverage' | 'drilling' | 'mastered';
   stats: QCodeStats;
+  shuffledOrder?: string;
+  currentIndex?: number;
+}
+
+interface RecentAnswer {
+  questionId: string;
+  answeredAt: number;
+}
+
+const RECENT_ANSWERS_KEY = 'recentQCodeAnswers';
+const SHUFFLED_ORDER_KEY = 'qCodeShuffledOrder';
+const CURRENT_INDEX_KEY = 'qCodeCurrentIndex';
+
+function getRecentAnswers(): RecentAnswer[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(RECENT_ANSWERS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentAnswers(answers: RecentAnswer[]): void {
+  if (typeof window === 'undefined') return;
+  // Keep only last 20 answers
+  const trimmed = answers.slice(-20);
+  localStorage.setItem(RECENT_ANSWERS_KEY, JSON.stringify(trimmed));
+}
+
+function getShuffledOrder(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(SHUFFLED_ORDER_KEY);
+}
+
+function saveShuffledOrder(order: string | null): void {
+  if (typeof window === 'undefined') return;
+  if (order) {
+    localStorage.setItem(SHUFFLED_ORDER_KEY, order);
+  } else {
+    localStorage.removeItem(SHUFFLED_ORDER_KEY);
+  }
+}
+
+function getCurrentIndex(): number {
+  if (typeof window === 'undefined') return 0;
+  const stored = localStorage.getItem(CURRENT_INDEX_KEY);
+  return stored ? parseInt(stored, 10) : 0;
+}
+
+function saveCurrentIndex(index: number | null): void {
+  if (typeof window === 'undefined') return;
+  if (index !== null) {
+    localStorage.setItem(CURRENT_INDEX_KEY, index.toString());
+  } else {
+    localStorage.removeItem(CURRENT_INDEX_KEY);
+  }
 }
 
 export default function QCodesPage() {
@@ -28,11 +87,33 @@ export default function QCodesPage() {
   const [phase, setPhase] = useState<'coverage' | 'drilling' | 'mastered'>('coverage');
   const [stats, setStats] = useState<QCodeStats | null>(null);
 
+  const recentAnswersRef = useRef<RecentAnswer[]>([]);
+
+  // Load recent answers on mount
+  useEffect(() => {
+    recentAnswersRef.current = getRecentAnswers();
+  }, []);
+
   const loadNextQCode = useCallback(async () => {
     setLoading(true);
     setRevealed(false);
     try {
-      const response = await fetch('/api/q-codes/next');
+      const recentAnswers = recentAnswersRef.current;
+      const shuffledOrder = getShuffledOrder();
+      const currentIndex = getCurrentIndex();
+
+      const params = new URLSearchParams();
+      if (recentAnswers.length > 0) {
+        params.set('recentTimestamps', JSON.stringify(recentAnswers));
+        params.set('exclude', recentAnswers.map((r) => r.questionId).join(','));
+      }
+      if (shuffledOrder) {
+        params.set('shuffledOrder', shuffledOrder);
+        params.set('currentIndex', currentIndex.toString());
+      }
+
+      const url = `/api/q-codes/next${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to load Q code');
       }
@@ -40,6 +121,14 @@ export default function QCodesPage() {
       setCurrentQCode(data.qCode);
       setPhase(data.phase);
       setStats(data.stats);
+
+      // Update shuffled order from response
+      if (data.shuffledOrder !== undefined) {
+        saveShuffledOrder(data.shuffledOrder);
+      }
+      if (data.currentIndex !== undefined) {
+        saveCurrentIndex(data.currentIndex);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -69,6 +158,14 @@ export default function QCodesPage() {
         throw new Error('Failed to record attempt');
       }
 
+      // Track recent answer
+      const newAnswer: RecentAnswer = {
+        questionId: currentQCode.id,
+        answeredAt: Date.now(),
+      };
+      recentAnswersRef.current = [...recentAnswersRef.current, newAnswer];
+      saveRecentAnswers(recentAnswersRef.current);
+
       // Load next Q code
       await loadNextQCode();
     } catch (err) {
@@ -79,6 +176,9 @@ export default function QCodesPage() {
   }
 
   function handleReset() {
+    // Clear coverage order to start fresh
+    saveShuffledOrder(null);
+    saveCurrentIndex(null);
     loadNextQCode();
   }
 
@@ -211,7 +311,9 @@ export default function QCodesPage() {
 
 function QCodeProgress({ stats }: { stats: QCodeStats }) {
   const masteredPercent = (stats.mastered / stats.total) * 100;
+  const strongPercent = (stats.strong / stats.total) * 100;
   const learningPercent = (stats.learning / stats.total) * 100;
+  const weakPercent = (stats.weak / stats.total) * 100;
   const unseenPercent = (stats.unseen / stats.total) * 100;
 
   return (
@@ -230,11 +332,25 @@ function QCodeProgress({ stats }: { stats: QCodeStats }) {
             title={`Mastered: ${stats.mastered}`}
           />
         )}
+        {strongPercent > 0 && (
+          <div
+            className="bg-emerald-400 transition-all duration-300"
+            style={{ width: `${strongPercent}%` }}
+            title={`Strong: ${stats.strong}`}
+          />
+        )}
         {learningPercent > 0 && (
           <div
             className="bg-amber-400 transition-all duration-300"
             style={{ width: `${learningPercent}%` }}
             title={`Learning: ${stats.learning}`}
+          />
+        )}
+        {weakPercent > 0 && (
+          <div
+            className="bg-red-400 transition-all duration-300"
+            style={{ width: `${weakPercent}%` }}
+            title={`Weak: ${stats.weak}`}
           />
         )}
         {unseenPercent > 0 && (
@@ -246,15 +362,23 @@ function QCodeProgress({ stats }: { stats: QCodeStats }) {
         )}
       </div>
 
-      {/* Legend */}
-      <div className="flex justify-center gap-6 mt-3 text-xs text-slate-500">
+      {/* Legend - show all 5 categories */}
+      <div className="flex flex-wrap justify-center gap-4 mt-3 text-xs text-slate-500">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-green-500" />
           <span>Mastered ({stats.mastered})</span>
         </div>
         <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-full bg-emerald-400" />
+          <span>Strong ({stats.strong})</span>
+        </div>
+        <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-amber-400" />
           <span>Learning ({stats.learning})</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded-full bg-red-400" />
+          <span>Weak ({stats.weak})</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-slate-300" />
