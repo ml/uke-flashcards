@@ -416,7 +416,7 @@ function StudyContent() {
       return `${baseClass} border-green-500 bg-green-50 text-green-800`;
     }
 
-    if (answerLetter === selectedAnswer && !attemptResult?.isCorrect) {
+    if (answerLetter === selectedAnswer && attemptResult?.isCorrect === false) {
       return `${baseClass} border-red-500 bg-red-50 text-red-800`;
     }
 
