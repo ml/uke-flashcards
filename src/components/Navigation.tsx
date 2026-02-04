@@ -23,6 +23,12 @@ export function Navigation() {
               Study
             </Link>
             <Link
+              href="/q-codes"
+              className="hover:text-slate-300 transition-colors font-medium"
+            >
+              Q Codes
+            </Link>
+            <Link
               href="/dashboard"
               className="hover:text-slate-300 transition-colors font-medium"
             >

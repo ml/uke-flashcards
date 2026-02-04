@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestionById } from '@/lib/questions';
+import { getQCodeById } from '@/lib/qcodes';
 import type { AttemptInsert } from '@/types/database';
 
 /**
  * POST /api/attempts
  * Records a question attempt in the database.
+ * Supports both exam questions (Q*) and Q codes (QC-*).
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -22,15 +24,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const question = getQuestionById(questionId);
-  if (!question) {
-    return NextResponse.json(
-      { error: 'Question not found' },
-      { status: 404 }
-    );
-  }
+  let isCorrect: boolean;
+  let correctAnswer: string;
 
-  const isCorrect = question.correctAnswerLetter === selectedAnswer;
+  // Handle Q codes (self-assessment based)
+  if (questionId.startsWith('QC-')) {
+    const qCode = getQCodeById(questionId);
+    if (!qCode) {
+      return NextResponse.json(
+        { error: 'Q code not found' },
+        { status: 404 }
+      );
+    }
+    // For Q codes, selectedAnswer is 'CORRECT' or 'WRONG' (self-assessment)
+    isCorrect = selectedAnswer === 'CORRECT';
+    correctAnswer = qCode.meaning;
+  } else {
+    // Handle exam questions
+    const question = getQuestionById(questionId);
+    if (!question) {
+      return NextResponse.json(
+        { error: 'Question not found' },
+        { status: 404 }
+      );
+    }
+    isCorrect = question.correctAnswerLetter === selectedAnswer;
+    correctAnswer = question.correctAnswerLetter;
+  }
 
   const db = getDb();
   const stmt = db.prepare(`
@@ -55,6 +75,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     id: result.lastInsertRowid,
     isCorrect,
-    correctAnswer: question.correctAnswerLetter,
+    correctAnswer,
   });
 }

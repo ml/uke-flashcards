@@ -1,0 +1,134 @@
+{
+  "qCodes": [
+    {
+      "id": "QC-QRA",
+      "code": "QRA",
+      "meaning": "Moja stacja nazywa się…",
+      "meaningEnglish": "My station is called...",
+      "hint": "Radio Address"
+    },
+    {
+      "id": "QC-QRG",
+      "code": "QRG",
+      "meaning": "Twoja częstotliwość wynosi…",
+      "meaningEnglish": "Your frequency is...",
+      "hint": "freGuency"
+    },
+    {
+      "id": "QC-QRK",
+      "code": "QRK",
+      "meaning": "Czytelność waszych sygnałów wynosi (1-5)",
+      "meaningEnglish": "Readability of your signals is (1-5)",
+      "hint": "ranKing"
+    },
+    {
+      "id": "QC-QRL",
+      "code": "QRL",
+      "meaning": "Jestem zajęty, proszę nie przeszkadzać",
+      "meaningEnglish": "I am busy, please don't interfere",
+      "hint": "QRwa Leave me"
+    },
+    {
+      "id": "QC-QRM",
+      "code": "QRM",
+      "meaning": "Mam przeszkody w odbiorze, zakłócenia od innych stacji",
+      "meaningEnglish": "I have interference from other stations",
+      "hint": "Radio Mess"
+    },
+    {
+      "id": "QC-QRN",
+      "code": "QRN",
+      "meaning": "Mam zakłócenia atmosferyczne",
+      "meaningEnglish": "I have atmospheric interference",
+      "hint": "Rain Noise"
+    },
+    {
+      "id": "QC-QRO",
+      "code": "QRO",
+      "meaning": "Zwiększ moc, duża moc",
+      "meaningEnglish": "Increase power, high power",
+      "hint": "ROsnąca moc"
+    },
+    {
+      "id": "QC-QRP",
+      "code": "QRP",
+      "meaning": "Zmniejsz moc, mała moc",
+      "meaningEnglish": "Decrease power, low power",
+      "hint": "Reduce Power"
+    },
+    {
+      "id": "QC-QRT",
+      "code": "QRT",
+      "meaning": "Kończę nadawanie, wyłączam stację",
+      "meaningEnglish": "I am closing down, stopping transmission",
+      "hint": "Radio Terminate"
+    },
+    {
+      "id": "QC-QRV",
+      "code": "QRV",
+      "meaning": "Jestem gotów do pracy",
+      "meaningEnglish": "I am ready to work",
+      "hint": "Radio aVailable"
+    },
+    {
+      "id": "QC-QRX",
+      "code": "QRX",
+      "meaning": "Proszę poczekać, zawołam was o godzinie…",
+      "meaningEnglish": "Please stand by, I will call you at...",
+      "hint": "eXpect delay (time)"
+    },
+    {
+      "id": "QC-QRZ",
+      "code": "QRZ",
+      "meaning": "Kto mnie woła?",
+      "meaningEnglish": "Who is calling me?",
+      "hint": "QueRy, who iZ calling?"
+    },
+    {
+      "id": "QC-QSB",
+      "code": "QSB",
+      "meaning": "Siła waszego sygnału waha się",
+      "meaningEnglish": "Your signal strength is fading",
+      "hint": "Signal Bouncing"
+    },
+    {
+      "id": "QC-QSL",
+      "code": "QSL",
+      "meaning": "Potwierdzam, przyślę kartę QSL",
+      "meaningEnglish": "I confirm, will send QSL card",
+      "hint": "Stamp Letter"
+    },
+    {
+      "id": "QC-QSO",
+      "code": "QSO",
+      "meaning": "Łączność, mam połączenie",
+      "meaningEnglish": "Contact, I have a connection",
+      "hint": "conecSiOn"
+    },
+    {
+      "id": "QC-QSY",
+      "code": "QSY",
+      "meaning": "Przejdźcie na częstotliwość…",
+      "meaningEnglish": "Change to frequency...",
+      "hint": "Switch frequencY"
+    },
+    {
+      "id": "QC-QTC",
+      "code": "QTC",
+      "meaning": "Mam dla was wiadomość",
+      "meaningEnglish": "I have a message for you",
+      "hint": "Telegram Coming"
+    },
+    {
+      "id": "QC-QTH",
+      "code": "QTH",
+      "meaning": "Moje położenie geograficzne to…",
+      "meaningEnglish": "My location is...",
+      "hint": "THere"
+    }
+  ],
+  "metadata": {
+    "source": "https://www.radioklucz.pl/q/",
+    "totalCodes": 18
+  }
+}

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
-import { getQuestions } from '@/lib/questions';
+import { getQuestions, getSections } from '@/lib/questions';
 import type { Section } from '@/types/questions';
+
+const QUESTIONS_PER_SECTION = 5;
 
 interface AttemptStats {
   question_id: string;
@@ -12,12 +14,101 @@ interface AttemptStats {
 }
 
 /**
+ * Selects questions from a pool using spaced repetition logic.
+ * Prioritizes: never-seen → wrong answers (recent failures first) → random fill.
+ */
+function selectQuestionsFromPool(
+  questionPool: string[],
+  statsMap: Map<string, AttemptStats>,
+  targetCount: number
+): string[] {
+  const neverSeen: string[] = [];
+  const leastAnswered: { id: string; attempts: number }[] = [];
+  const wrongAnswers: { id: string; lastAttempt: string; isRecentWrong: boolean }[] = [];
+
+  for (const qId of questionPool) {
+    const stat = statsMap.get(qId);
+    if (!stat) {
+      neverSeen.push(qId);
+    } else {
+      leastAnswered.push({ id: qId, attempts: stat.total_attempts });
+      if (stat.last_was_wrong) {
+        wrongAnswers.push({
+          id: qId,
+          lastAttempt: stat.last_attempt_at,
+          isRecentWrong: true,
+        });
+      } else if (stat.total_attempts > stat.correct_attempts) {
+        wrongAnswers.push({
+          id: qId,
+          lastAttempt: stat.last_attempt_at,
+          isRecentWrong: false,
+        });
+      }
+    }
+  }
+
+  // Sort: fewer attempts first
+  leastAnswered.sort((a, b) => a.attempts - b.attempts);
+  // Sort: recent failures first, then by last attempt (most recent first)
+  wrongAnswers.sort((a, b) => {
+    if (a.isRecentWrong !== b.isRecentWrong) {
+      return a.isRecentWrong ? -1 : 1;
+    }
+    return b.lastAttempt.localeCompare(a.lastAttempt);
+  });
+
+  const selectedIds = new Set<string>();
+
+  // First, add never-seen questions
+  for (const qId of neverSeen) {
+    if (selectedIds.size >= targetCount) break;
+    selectedIds.add(qId);
+  }
+
+  // Then fill with least answered
+  for (const { id } of leastAnswered) {
+    if (selectedIds.size >= targetCount) break;
+    if (!selectedIds.has(id)) {
+      selectedIds.add(id);
+    }
+  }
+
+  // Then fill with wrong answers
+  for (const { id } of wrongAnswers) {
+    if (selectedIds.size >= targetCount) break;
+    if (!selectedIds.has(id)) {
+      selectedIds.add(id);
+    }
+  }
+
+  // If we still need more, fill randomly from the pool
+  if (selectedIds.size < targetCount) {
+    const shuffledPool = [...questionPool];
+    for (let i = shuffledPool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]];
+    }
+    for (const qId of shuffledPool) {
+      if (selectedIds.size >= targetCount) break;
+      if (!selectedIds.has(qId)) {
+        selectedIds.add(qId);
+      }
+    }
+  }
+
+  return Array.from(selectedIds);
+}
+
+/**
  * POST /api/sessions
  * Creates a new 20-question session using spaced repetition algorithm.
  *
  * Selection strategy:
- * - 10 questions: least answered (prioritize never-seen)
- * - 10 questions: wrong answers (prioritize recent failures)
+ * - Default mode (no section): 5 questions from each of the 4 sections (20 total)
+ *   with spaced repetition applied within each section
+ * - Single-section mode: 20 questions from the specified section
+ *   using spaced repetition (never-seen → wrong answers → random)
  *
  * Request body:
  * - section?: string - Filter questions by section (optional)
@@ -28,18 +119,6 @@ export async function POST(request: NextRequest) {
 
   const db = getDb();
   const allQuestions = getQuestions();
-
-  // Filter by section if specified
-  const availableQuestions = section
-    ? allQuestions.filter((q) => q.section === section)
-    : allQuestions;
-
-  if (availableQuestions.length === 0) {
-    return NextResponse.json(
-      { error: 'No questions available for the selected section' },
-      { status: 400 }
-    );
-  }
 
   // Get attempt statistics for all questions
   const stats = db
@@ -61,93 +140,44 @@ export async function POST(request: NextRequest) {
 
   const statsMap = new Map(stats.map((s) => [s.question_id, s]));
 
-  // Available question IDs in this section/pool
-  const questionPool = availableQuestions.map((q) => q.id);
+  let selectedIds: string[];
 
-  // Categorize questions
-  const neverSeen: string[] = [];
-  const leastAnswered: { id: string; attempts: number }[] = [];
-  const wrongAnswers: { id: string; lastAttempt: string; isRecentWrong: boolean }[] = [];
+  if (section) {
+    // Single-section mode: 20 questions from the specified section
+    const sectionQuestions = allQuestions.filter((q) => q.section === section);
 
-  for (const qId of questionPool) {
-    const stat = statsMap.get(qId);
-    if (!stat) {
-      neverSeen.push(qId);
-    } else {
-      leastAnswered.push({ id: qId, attempts: stat.total_attempts });
-      if (stat.last_was_wrong) {
-        wrongAnswers.push({
-          id: qId,
-          lastAttempt: stat.last_attempt_at,
-          isRecentWrong: true,
-        });
-      } else if (stat.total_attempts > stat.correct_attempts) {
-        // Has some wrong answers historically
-        wrongAnswers.push({
-          id: qId,
-          lastAttempt: stat.last_attempt_at,
-          isRecentWrong: false,
-        });
-      }
+    if (sectionQuestions.length === 0) {
+      return NextResponse.json(
+        { error: 'No questions available for the selected section' },
+        { status: 400 }
+      );
     }
+
+    const sectionPool = sectionQuestions.map((q) => q.id);
+    selectedIds = selectQuestionsFromPool(sectionPool, statsMap, 20);
+  } else {
+    // Multi-section mode: 5 questions from each of the 4 sections
+    const sections = getSections();
+    const allSelectedIds: string[] = [];
+
+    for (const sec of sections) {
+      const sectionQuestions = allQuestions.filter((q) => q.section === sec);
+      const sectionPool = sectionQuestions.map((q) => q.id);
+      const sectionSelection = selectQuestionsFromPool(
+        sectionPool,
+        statsMap,
+        QUESTIONS_PER_SECTION
+      );
+      allSelectedIds.push(...sectionSelection);
+    }
+
+    selectedIds = allSelectedIds;
   }
 
-  // Sort for selection
-  // Least answered: fewer attempts first
-  leastAnswered.sort((a, b) => a.attempts - b.attempts);
-  // Wrong answers: recent failures first, then by last attempt (most recent first)
-  wrongAnswers.sort((a, b) => {
-    if (a.isRecentWrong !== b.isRecentWrong) {
-      return a.isRecentWrong ? -1 : 1;
-    }
-    return b.lastAttempt.localeCompare(a.lastAttempt);
-  });
-
-  // Select 10 "least answered" questions (prioritize never-seen)
-  const selectedIds = new Set<string>();
-
-  // First, add never-seen questions
-  for (const qId of neverSeen) {
-    if (selectedIds.size >= 10) break;
-    selectedIds.add(qId);
-  }
-
-  // Then fill with least answered
-  for (const { id } of leastAnswered) {
-    if (selectedIds.size >= 10) break;
-    if (!selectedIds.has(id)) {
-      selectedIds.add(id);
-    }
-  }
-
-  // Select up to 10 "wrong" questions
-  for (const { id } of wrongAnswers) {
-    if (selectedIds.size >= 20) break;
-    if (!selectedIds.has(id)) {
-      selectedIds.add(id);
-    }
-  }
-
-  // If we don't have 20 questions yet, fill with remaining questions
-  const allPoolIds = [...questionPool];
-  // Shuffle for randomness
-  for (let i = allPoolIds.length - 1; i > 0; i--) {
+  // Shuffle the final selection
+  for (let i = selectedIds.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [allPoolIds[i], allPoolIds[j]] = [allPoolIds[j], allPoolIds[i]];
-  }
-
-  for (const qId of allPoolIds) {
-    if (selectedIds.size >= 20) break;
-    if (!selectedIds.has(qId)) {
-      selectedIds.add(qId);
-    }
-  }
-
-  // Convert to array and shuffle the final selection
-  const sessionQuestionIds = Array.from(selectedIds);
-  for (let i = sessionQuestionIds.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [sessionQuestionIds[i], sessionQuestionIds[j]] = [sessionQuestionIds[j], sessionQuestionIds[i]];
+    [selectedIds[i], selectedIds[j]] = [selectedIds[j], selectedIds[i]];
   }
 
   // Create the session in database
@@ -155,8 +185,8 @@ export async function POST(request: NextRequest) {
   const sessionId = sessionResult.lastInsertRowid as number;
 
   // Get full question data
-  const sessionQuestions = sessionQuestionIds.map((id) =>
-    availableQuestions.find((q) => q.id === id)!
+  const sessionQuestions = selectedIds.map((id) =>
+    allQuestions.find((q) => q.id === id)!
   );
 
   return NextResponse.json({

@@ -9390,7 +9390,7 @@
       ],
       "correctAnswerLetter": "B",
       "section": "Radiotechnika",
-      "hint": "Przeanalizuj układ: kondensatory są w gałęzi szeregowej, a cewka w gałęzi równoległej do masy. Zastanów się, jak te elementy zachowują się dla niskich i wysokich częstotliwości.",
+      "hint": "Patrz tylko na elementy SZEREGOWE – one decydują, co ma przejść.\n\nKondensator w szeregu → chce przepuścić wysokie\n\nCewka w szeregu → chce przepuścić niskie",
       "explanation": "W opisanym układzie T, szeregowe kondensatory blokują niskie częstotliwości, a równoległa cewka dodatkowo zwiera je do masy. Wysokie częstotliwości są natomiast przepuszczane przez kondensatory, a cewka stanowi dla nich dużą impedancję. Taka konfiguracja jest charakterystyczna dla filtru górnoprzepustowego."
     },
     {

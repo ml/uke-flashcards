@@ -15,9 +15,9 @@ export function HintsProvider({ children }: { children: ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('hintsEnabled');
-    if (stored) {
-      setHintsEnabled(JSON.parse(stored));
+    const storedHints = localStorage.getItem('hintsEnabled');
+    if (storedHints) {
+      setHintsEnabled(JSON.parse(storedHints));
     }
     setIsHydrated(true);
   }, []);
