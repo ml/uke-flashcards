@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestionById } from '@/lib/questions';
 import { getQCodeById } from '@/lib/qcodes';
+import { getLetterById } from '@/lib/alphabet';
 import type { AttemptInsert } from '@/types/database';
 
 /**
  * POST /api/attempts
  * Records a question attempt in the database.
- * Supports both exam questions (Q*) and Q codes (QC-*).
+ * Supports exam questions (Q*), Q codes (QC-*), and alphabet letters (AL-*).
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -39,6 +40,18 @@ export async function POST(request: NextRequest) {
     // For Q codes, selectedAnswer is 'CORRECT' or 'WRONG' (self-assessment)
     isCorrect = selectedAnswer === 'CORRECT';
     correctAnswer = qCode.meaning;
+  } else if (questionId.startsWith('AL-')) {
+    // Handle alphabet letters (self-assessment based)
+    const letter = getLetterById(questionId);
+    if (!letter) {
+      return NextResponse.json(
+        { error: 'Alphabet letter not found' },
+        { status: 404 }
+      );
+    }
+    // For alphabet, selectedAnswer is 'CORRECT' or 'WRONG' (self-assessment)
+    isCorrect = selectedAnswer === 'CORRECT';
+    correctAnswer = letter.phonetic;
   } else {
     // Handle exam questions
     const question = getQuestionById(questionId);
