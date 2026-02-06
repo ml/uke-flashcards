@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Development
+.env
+.env.local
+.env.*.local
+.credentials
+.DS_Store
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.code-workspace
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Build artifacts
+.next
+dist
+out
+build
+
+# Database files (managed via volume)
+*.db
+*.db-wal
+*.db-shm
+data/uke-flashcards.db*
+
+# Testing
+.nyc_output
+coverage
+jest.results.json
+
+# Misc
+README.md
+CHANGELOG.md
+LICENSE
+.prettierrc
+.eslintrc*
