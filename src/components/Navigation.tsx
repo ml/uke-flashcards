@@ -29,6 +29,12 @@ export function Navigation() {
               Q Codes
             </Link>
             <Link
+              href="/alphabet"
+              className="hover:text-slate-300 transition-colors font-medium"
+            >
+              Alfabet
+            </Link>
+            <Link
               href="/dashboard"
               className="hover:text-slate-300 transition-colors font-medium"
             >

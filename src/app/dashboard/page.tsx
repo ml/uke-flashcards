@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface SectionStat {
   totalQuestions: number;
@@ -68,6 +69,20 @@ interface QuestionDetail {
   attempts: QuestionAttempt[];
 }
 
+interface AlphabetStats {
+  total: number;
+  unseen: number;
+  weak: number;
+  learning: number;
+  strong: number;
+  mastered: number;
+}
+
+interface AlphabetDashboardStats {
+  polish: AlphabetStats;
+  nato: AlphabetStats;
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,10 +92,12 @@ export default function DashboardPage() {
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [sessionHistory, setSessionHistory] = useState<SessionHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [alphabetStats, setAlphabetStats] = useState<AlphabetDashboardStats | null>(null);
 
   useEffect(() => {
     fetchStats();
     fetchSessionHistory();
+    fetchAlphabetStats();
   }, []);
 
   async function fetchStats() {
@@ -110,6 +127,19 @@ export default function DashboardPage() {
       console.error('Failed to fetch session history:', err);
     } finally {
       setLoadingHistory(false);
+    }
+  }
+
+  async function fetchAlphabetStats() {
+    try {
+      const response = await fetch('/api/alphabet/stats');
+      if (!response.ok) {
+        throw new Error('Failed to fetch alphabet statistics');
+      }
+      const data = await response.json();
+      setAlphabetStats(data);
+    } catch (err) {
+      console.error('Failed to fetch alphabet stats:', err);
     }
   }
 
@@ -221,6 +251,31 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
+
+      {/* Alphabet Progress */}
+      {alphabetStats && (
+        <section className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Alphabet Progress</h2>
+          <div className="space-y-4">
+            <AlphabetProgressRow
+              label="Polski"
+              stats={alphabetStats.polish}
+            />
+            <AlphabetProgressRow
+              label="NATO / ICAO"
+              stats={alphabetStats.nato}
+            />
+          </div>
+          <div className="mt-4">
+            <Link
+              href="/alphabet"
+              className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Ćwicz alfabet
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Session History */}
       <section className="bg-white rounded-lg shadow p-6">
@@ -544,6 +599,64 @@ function SessionHistoryRow({ session }: { session: SessionHistory }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function AlphabetProgressRow({ label, stats }: { label: string; stats: AlphabetStats }) {
+  const masteredPercent = (stats.mastered / stats.total) * 100;
+  const strongPercent = (stats.strong / stats.total) * 100;
+  const learningPercent = (stats.learning / stats.total) * 100;
+  const weakPercent = (stats.weak / stats.total) * 100;
+  const unseenPercent = (stats.unseen / stats.total) * 100;
+
+  const progressPercent = Math.round(((stats.total - stats.unseen) / stats.total) * 100);
+
+  return (
+    <div className="border rounded-lg p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-medium text-slate-800">{label}</span>
+        <span className="text-sm text-slate-500">
+          {stats.mastered} / {stats.total} mastered ({progressPercent}%)
+        </span>
+      </div>
+      <div className="h-3 bg-slate-100 rounded-full overflow-hidden flex">
+        {masteredPercent > 0 && (
+          <div
+            className="bg-green-500 transition-all duration-300"
+            style={{ width: `${masteredPercent}%` }}
+            title={`Mastered: ${stats.mastered}`}
+          />
+        )}
+        {strongPercent > 0 && (
+          <div
+            className="bg-emerald-400 transition-all duration-300"
+            style={{ width: `${strongPercent}%` }}
+            title={`Strong: ${stats.strong}`}
+          />
+        )}
+        {learningPercent > 0 && (
+          <div
+            className="bg-amber-400 transition-all duration-300"
+            style={{ width: `${learningPercent}%` }}
+            title={`Learning: ${stats.learning}`}
+          />
+        )}
+        {weakPercent > 0 && (
+          <div
+            className="bg-red-400 transition-all duration-300"
+            style={{ width: `${weakPercent}%` }}
+            title={`Weak: ${stats.weak}`}
+          />
+        )}
+        {unseenPercent > 0 && (
+          <div
+            className="bg-slate-300 transition-all duration-300"
+            style={{ width: `${unseenPercent}%` }}
+            title={`Unseen: ${stats.unseen}`}
+          />
+        )}
+      </div>
     </div>
   );
 }
