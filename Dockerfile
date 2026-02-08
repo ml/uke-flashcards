@@ -63,6 +63,9 @@ COPY --from=builder /app/public ./public
 # Copy standalone build output from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
+# Copy static assets (CSS, JS chunks, images)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
 # Copy static data files (questions.json, alphabet.json, q_codes.json)
 COPY --chown=nextjs:nodejs data/questions.json ./data/
 COPY --chown=nextjs:nodejs data/alphabet.json ./data/
