@@ -4,8 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: uke-flashcards
-    ports:
-      - "3000:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -19,7 +17,18 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uke-flashcards.rule=Host(`uke.dev.kiszonka.com`)"
+      - "traefik.http.routers.uke-flashcards.entrypoints=web"
+      - "traefik.http.services.uke-flashcards.loadbalancer.server.port=3000"
+    networks:
+      - proxy_net
 
 volumes:
   uke-data:
     driver: local
+
+networks:
+  proxy_net:
+    external: true
