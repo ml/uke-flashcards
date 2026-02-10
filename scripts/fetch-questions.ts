@@ -334,7 +334,7 @@ function parseQuestionsFromListPage(html: string): QuestionWithRawImage[] {
 
     $card.find(".p-ans").each((_, ansEl) => {
       const $ans = $(ansEl);
-      const ansText = $ans.text().trim();
+      const ansText = $ans.text().replace(/\s+/g, ' ').trim();
 
       // Answer format: "A) answer text"
       const ansMatch = ansText.match(/^([A-Z])\)\s*(.+)$/);

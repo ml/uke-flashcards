@@ -5220,6 +5220,10 @@
         {
           "letter": "B",
           "text": "strefa bez odbioru z powodu dużych zakłóceń w mieście"
+        },
+        {
+          "letter": "C",
+          "text": "strefa w której brak odbioru z powodu interferencji fal przychodzących z różnych kierunków"
         }
       ],
       "correctAnswerLetter": "A",
@@ -6406,6 +6410,14 @@
       "text": "Kiedy wybierzemy częstotliwość nadawczą na naszym urządzeniu, jakie czynności należą do dobrej praktyki operatorskiej?",
       "answers": [
         {
+          "letter": "A",
+          "text": "upewnić się czy wybrana częstotliwość oraz użyta moc jest w zakresie uprawnień naszego pozwolenia"
+        },
+        {
+          "letter": "B",
+          "text": "znajduję się w miejscu zgodnym z przeznaczeniem wg. band planu IARU, oraz sprawdzam czy częstotliwość jest wolna i nie spowoduje interferencji z innymi użytkownikami"
+        },
+        {
           "letter": "C",
           "text": "wszystkie powyżej"
         }
@@ -6887,6 +6899,10 @@
         {
           "letter": "B",
           "text": "prowadzenie dziennika łączności nie jest obowiązkowe, lecz wskazane"
+        },
+        {
+          "letter": "C",
+          "text": "prowadzenie dziennika łączności może być nakazane jako zalecenie pokontrolne inspektorów ochrony środowiska"
         }
       ],
       "correctAnswerLetter": "B",
@@ -7688,6 +7704,10 @@
         {
           "letter": "B",
           "text": "przepisem powszechnie obowiązującym"
+        },
+        {
+          "letter": "C",
+          "text": "wydawaną przez IARU dyrektywą wprowadzaną do porządku krajowego w Krajowej Tablicy Przeznaczeń Częstotliwości"
         }
       ],
       "correctAnswerLetter": "A",
@@ -7730,6 +7750,10 @@
         {
           "letter": "B",
           "text": "może podawać raporty \"na ucho\" i poinformować o tym korespondenta"
+        },
+        {
+          "letter": "C",
+          "text": "nie ma żadnego powodu żeby podawać korespondentowi siłę jego sygnału jeśli słyszymy go poprawnie"
         }
       ],
       "correctAnswerLetter": "B",
@@ -7743,8 +7767,16 @@
       "text": "Czy używanie znaków wywoławczych podczas łączności jest obowiązkowe?",
       "answers": [
         {
+          "letter": "A",
+          "text": "Nie, ale jest to ogólnie przyjęty dobry zwyczaj, pozytywnie świadczący o operatorze, pozwalający potwierdzić przeprowadzoną łączność"
+        },
+        {
           "letter": "B",
           "text": "Tak, transmisja sygnałów bez identyfikacji jest zabroniona"
+        },
+        {
+          "letter": "C",
+          "text": "Nie, można nie podawać znaków wywoławczych w krótkich łącznościach, beż żadnych konsekwencji"
         }
       ],
       "correctAnswerLetter": "B",
@@ -8218,6 +8250,10 @@
       "text": "Czy prowadzenie papierowego dziennika łączności jest obowiązkowe?",
       "answers": [
         {
+          "letter": "A",
+          "text": "tak, obowiązkowe jest prowadzenie dziennika łączności w formie fizycznego dokumentu"
+        },
+        {
           "letter": "B",
           "text": "nie, obowiązkowy dziennik łączności może być prowadzony także elektronicznie"
         },
@@ -8236,6 +8272,14 @@
       "number": 358,
       "text": "Jakie należy spełnić warunki aby uzyskać pozwolenie radiowe na używanie stacji\namatorskiej?",
       "answers": [
+        {
+          "letter": "A",
+          "text": "należy posiadać świadectwo operatora urządzeń radiowych i odbyć trzymiesięczną praktykę na stacji klubowej"
+        },
+        {
+          "letter": "B",
+          "text": "należy posiadać świadectwo operatora urządzeń radiowych i co najmniej średnie wykształcenie"
+        },
         {
           "letter": "C",
           "text": "należy posiadać świadectwo operatora urządzeń radiowych"
@@ -8718,6 +8762,10 @@
         {
           "letter": "B",
           "text": "na końcu znaku stacji amatorskiej"
+        },
+        {
+          "letter": "C",
+          "text": "znak nie identyfikuje kraju dlatego musimy posługiwać się tzw. callbookiem lub specjalnymi stronami www"
         }
       ],
       "correctAnswerLetter": "A",
@@ -10694,6 +10742,10 @@
         {
           "letter": "B",
           "text": "pracy z maksymalną mocą nadajnika"
+        },
+        {
+          "letter": "C",
+          "text": "doboru mocy nadajnika do ograniczeń licencyjnych w kraju, z którym nawiązujemy łączność"
         }
       ],
       "correctAnswerLetter": "A",
@@ -10897,6 +10949,10 @@
         {
           "letter": "B",
           "text": "blokowanie odbiornika przez bardzo silne sygnały, także spoza pasm amatorskich"
+        },
+        {
+          "letter": "C",
+          "text": "uszkodzenie odbiornika spowodowane sygnałem pobliskiego przemiennika w paśmie 2 m"
         }
       ],
       "correctAnswerLetter": "B",
@@ -10916,6 +10972,10 @@
         {
           "letter": "B",
           "text": "rozstrajanie generatora zadającego w syntezerze w odbiorniku FM"
+        },
+        {
+          "letter": "C",
+          "text": "detekcja sygnału SSB stacji amatorskiej we wzmacniaczu częstotliwości akustycznej odbiornika"
         }
       ],
       "correctAnswerLetter": "A",
