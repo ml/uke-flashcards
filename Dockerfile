@@ -66,16 +66,22 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # Copy static assets (CSS, JS chunks, images)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy static data files (questions.json, alphabet.json, q_codes.json)
-COPY --chown=nextjs:nodejs data/questions.json ./data/
-COPY --chown=nextjs:nodejs data/alphabet.json ./data/
-COPY --chown=nextjs:nodejs data/q_codes.json ./data/
+# Copy static data files to staging directory (outside the volume mount)
+COPY --chown=nextjs:nodejs data/questions.json ./static-data/
+COPY --chown=nextjs:nodejs data/alphabet.json ./static-data/
+COPY --chown=nextjs:nodejs data/q_codes.json ./static-data/
 
 # Create data directory for database persistence
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
+# Copy entrypoint script that syncs static files into the volume on every start
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Switch to non-root user
 USER nextjs
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Expose port
 EXPOSE 3000
