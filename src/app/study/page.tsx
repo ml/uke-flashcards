@@ -568,7 +568,7 @@ function StudyContent() {
             All Questions Mastered!
           </h2>
           <p className="text-slate-600 mb-6">
-            Congratulations! You've mastered all{' '}
+            Congratulations! You&apos;ve mastered all{' '}
             {selectedSection ? `${selectedSection} ` : ''}questions.
           </p>
           <button
@@ -696,6 +696,7 @@ function StudyContent() {
           {/* Question diagram image */}
           {displayQuestion.imageUrl && (
             <div className="mt-4 flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={displayQuestion.imageUrl}
                 alt={`Diagram for question ${displayQuestion.number}`}

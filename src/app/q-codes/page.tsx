@@ -210,7 +210,7 @@ export default function QCodesPage() {
             All Q Codes Mastered!
           </h2>
           <p className="text-slate-600 mb-6">
-            Congratulations! You've mastered all 18 Q codes.
+            Congratulations! You&apos;ve mastered all 18 Q codes.
           </p>
           <button
             onClick={handleReset}
