@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestions, getSections } from '@/lib/questions';
-import type { Section } from '@/types/questions';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 
-interface QuestionStats {
+interface QuestionStatsRow {
   question_id: string;
   total_attempts: number;
   correct_attempts: number;
@@ -15,16 +15,52 @@ interface QuestionStats {
 /**
  * GET /api/stats
  * Returns comprehensive statistics for the dashboard.
+ * Scoped to authenticated user. Anonymous users get zeros.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
   const db = getDb();
   const allQuestions = getQuestions();
   const allSections = getSections();
 
+  if (!userId) {
+    // Anonymous: return zero stats
+    const zeroSections: Record<string, {
+      totalQuestions: number;
+      questionsAttempted: number;
+      totalAttempts: number;
+      correctAttempts: number;
+      correctnessRate: number;
+      passingStatus: boolean;
+    }> = {};
+    for (const section of allSections) {
+      const sectionQuestions = allQuestions.filter((q) => q.section === section);
+      zeroSections[section] = {
+        totalQuestions: sectionQuestions.length,
+        questionsAttempted: 0,
+        totalAttempts: 0,
+        correctAttempts: 0,
+        correctnessRate: 0,
+        passingStatus: false,
+      };
+    }
+    return NextResponse.json({
+      overall: {
+        totalQuestions: allQuestions.length,
+        questionsAttempted: 0,
+        totalAttempts: 0,
+        correctAttempts: 0,
+        correctnessRate: 0,
+      },
+      bySection: zeroSections,
+      weakAreas: [],
+    });
+  }
+
   // Create a map for quick question lookups
   const questionMap = new Map(allQuestions.map((q) => [q.id, q]));
 
-  // Get per-question statistics (only questions with attempts)
+  // Get per-question statistics scoped to user
   const questionStats = db
     .prepare(
       `
@@ -34,10 +70,11 @@ export async function GET() {
         SUM(is_correct) as correct_attempts,
         CAST(SUM(is_correct) AS FLOAT) / COUNT(*) as correctness_rate
       FROM attempts
+      WHERE user_id = ?
       GROUP BY question_id
     `
     )
-    .all() as QuestionStats[];
+    .all(userId) as QuestionStatsRow[];
 
   const statsMap = new Map(questionStats.map((s) => [s.question_id, s]));
 
@@ -101,7 +138,7 @@ export async function GET() {
       };
     });
 
-  // Get overall totals
+  // Get overall totals scoped to user
   const overallStats = db
     .prepare(
       `
@@ -109,9 +146,10 @@ export async function GET() {
         COUNT(*) as total_attempts,
         SUM(is_correct) as correct_attempts
       FROM attempts
+      WHERE user_id = ?
     `
     )
-    .get() as { total_attempts: number; correct_attempts: number };
+    .get(userId) as { total_attempts: number; correct_attempts: number };
 
   return NextResponse.json({
     overall: {

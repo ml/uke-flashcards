@@ -1,5 +1,6 @@
 logs
 .credentials
+.env
 node_modules
 data/debug-*.html
 

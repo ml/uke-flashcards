@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/components/AuthContext';
 
 interface SectionStat {
   totalQuestions: number;
@@ -84,6 +85,7 @@ interface AlphabetDashboardStats {
 }
 
 export default function DashboardPage() {
+  const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,10 +97,28 @@ export default function DashboardPage() {
   const [alphabetStats, setAlphabetStats] = useState<AlphabetDashboardStats | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
     fetchStats();
     fetchSessionHistory();
     fetchAlphabetStats();
-  }, []);
+  }, [authLoading]);
+
+  if (!authLoading && !user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+        <p className="text-slate-600">
+          Zaloguj się, aby zobaczyć swoje postępy.
+        </p>
+        <Link
+          href="/login"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        >
+          Zaloguj się
+        </Link>
+      </div>
+    );
+  }
 
   async function fetchStats() {
     try {

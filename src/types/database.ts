@@ -5,6 +5,7 @@
 /** A study session record */
 export interface Session {
   id: number;
+  user_id: number | null;
   created_at: string;
   completed_at: string | null;
 }
@@ -14,6 +15,7 @@ export interface Attempt {
   id: number;
   question_id: string;
   session_id: number | null;
+  user_id: number | null;
   selected_answer: string;
   is_correct: boolean;
   created_at: string;
@@ -23,6 +25,7 @@ export interface Attempt {
 export interface AttemptInsert {
   question_id: string;
   session_id?: number | null;
+  user_id?: number | null;
   selected_answer: string;
   is_correct: boolean;
 }

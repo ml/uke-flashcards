@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getAlphabet, getAlphabetIds } from '@/lib/alphabet';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 import {
   getQuestionStats,
   determinePhase,
@@ -56,12 +57,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const userId = getUserIdFromRequest(request);
   const db = getDb();
   const letters = getAlphabet(typeParam);
   const letterIds = getAlphabetIds(typeParam);
 
-  // Get stats using shared function
-  const statsMap = getQuestionStats(db);
+  // Get stats using shared function, scoped to user
+  const statsMap = getQuestionStats(db, userId ?? null);
 
   // Determine phase
   const phase = determinePhase(letterIds, statsMap);

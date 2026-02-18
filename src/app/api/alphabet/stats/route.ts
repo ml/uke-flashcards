@@ -1,20 +1,22 @@
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getAlphabetIds } from '@/lib/alphabet';
 import { getQuestionStats, getStatsSummary } from '@/lib/questionStats';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 import type { AlphabetStats } from '@/types/alphabet';
 
 /**
  * GET /api/alphabet/stats
  *
  * Returns progress statistics for both Polish and NATO alphabets.
- * Used by the dashboard to show overall alphabet progress.
+ * Scoped to authenticated user.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
   const db = getDb();
-  const statsMap = getQuestionStats(db);
+  const statsMap = getQuestionStats(db, userId ?? null);
 
   const polishIds = getAlphabetIds('polish');
   const natoIds = getAlphabetIds('nato');

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestions } from '@/lib/questions';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 import {
   getQuestionStats,
   determinePhase,
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
   const shuffledOrderParam = searchParams.get('shuffledOrder');
   const currentIndexParam = searchParams.get('currentIndex');
 
+  const userId = getUserIdFromRequest(request);
   const db = getDb();
   const allQuestions = getQuestions();
 
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
   }
 
   const questionIds = availableQuestions.map((q) => q.id);
-  const statsMap = getQuestionStats(db);
+  const statsMap = getQuestionStats(db, userId ?? null);
 
   // Determine phase
   const computedPhase = determinePhase(questionIds, statsMap);

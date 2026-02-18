@@ -2,8 +2,10 @@
 
 import { Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { Question, Section } from '@/types/questions';
 import { useHints } from '@/components/HintsContext';
+import { useAuth } from '@/components/AuthContext';
 import { StudyProgress } from '@/components/StudyProgress';
 
 interface AttemptResponse {
@@ -92,6 +94,7 @@ function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { hintsEnabled, isHydrated } = useHints();
+  const { user } = useAuth();
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
@@ -337,6 +340,35 @@ function StudyContent() {
     }
 
     setSelectedAnswer(answerLetter);
+
+    if (!user) {
+      // Anonymous: compute correctness client-side, skip API call
+      const isCorrect = displayQuestion.correctAnswerLetter === answerLetter;
+      setAttemptResult({
+        id: 0,
+        isCorrect,
+        correctAnswer: displayQuestion.correctAnswerLetter,
+      });
+
+      // Track recent answer for cooling period
+      if (!sessionMode) {
+        const newRecentAnswer: RecentAnswer = {
+          questionId: displayQuestion.id,
+          answeredAt: Date.now(),
+        };
+        const updatedRecent = [...recentAnswers, newRecentAnswer].slice(-20);
+        setRecentAnswers(updatedRecent);
+
+        const currentState = loadSessionState();
+        if (currentState) {
+          saveSessionState({
+            ...currentState,
+            recentAnswers: updatedRecent,
+          });
+        }
+      }
+      return;
+    }
 
     try {
       const response = await fetch('/api/attempts', {
@@ -652,7 +684,7 @@ function StudyContent() {
               Exit Session
             </button>
           </div>
-        ) : (
+        ) : user ? (
           <button
             onClick={handleStartSession}
             disabled={startingSession}
@@ -660,6 +692,13 @@ function StudyContent() {
           >
             {startingSession ? 'Starting...' : 'Start Session (20 Q)'}
           </button>
+        ) : (
+          <Link
+            href="/login"
+            className="px-4 py-2 rounded-lg bg-slate-200 text-slate-600 font-medium hover:bg-slate-300 transition-colors text-sm"
+          >
+            Zaloguj się, aby rozpocząć sesję
+          </Link>
         )}
       </div>
 

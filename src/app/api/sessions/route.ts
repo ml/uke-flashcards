@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestions, getSections } from '@/lib/questions';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 import type { Section } from '@/types/questions';
 
 const QUESTIONS_PER_SECTION = 5;
@@ -105,24 +106,24 @@ function selectQuestionsFromPool(
 /**
  * POST /api/sessions
  * Creates a new 20-question session using spaced repetition algorithm.
- *
- * Selection strategy:
- * - Default mode (no section): 5 questions from each of the 4 sections (20 total)
- *   with spaced repetition applied within each section
- * - Single-section mode: 20 questions from the specified section
- *   using spaced repetition (never-seen → wrong answers → random)
- *
- * Request body:
- * - section?: string - Filter questions by section (optional)
+ * Requires authentication.
  */
 export async function POST(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
+  }
+
   const body = await request.json();
   const { section } = body as { section?: Section | null };
 
   const db = getDb();
   const allQuestions = getQuestions();
 
-  // Get attempt statistics for all questions
+  // Get attempt statistics scoped to this user
   const stats = db
     .prepare(
       `
@@ -132,20 +133,20 @@ export async function POST(request: NextRequest) {
         SUM(is_correct) as correct_attempts,
         MAX(created_at) as last_attempt_at,
         (SELECT is_correct FROM attempts a2
-         WHERE a2.question_id = attempts.question_id
+         WHERE a2.question_id = attempts.question_id AND a2.user_id = ?
          ORDER BY created_at DESC LIMIT 1) = 0 as last_was_wrong
       FROM attempts
+      WHERE user_id = ?
       GROUP BY question_id
     `
     )
-    .all() as AttemptStats[];
+    .all(userId, userId) as AttemptStats[];
 
   const statsMap = new Map(stats.map((s) => [s.question_id, s]));
 
   let selectedIds: string[];
 
   if (section) {
-    // Single-section mode: 20 questions from the specified section
     const sectionQuestions = allQuestions.filter((q) => q.section === section);
 
     if (sectionQuestions.length === 0) {
@@ -158,7 +159,6 @@ export async function POST(request: NextRequest) {
     const sectionPool = sectionQuestions.map((q) => q.id);
     selectedIds = selectQuestionsFromPool(sectionPool, statsMap, 20);
   } else {
-    // Multi-section mode: 5 questions from each of the 4 sections
     const sections = getSections();
     const allSelectedIds: string[] = [];
 
@@ -182,8 +182,10 @@ export async function POST(request: NextRequest) {
     [selectedIds[i], selectedIds[j]] = [selectedIds[j], selectedIds[i]];
   }
 
-  // Create the session in database
-  const sessionResult = db.prepare('INSERT INTO sessions DEFAULT VALUES').run();
+  // Create the session in database with user_id
+  const sessionResult = db
+    .prepare('INSERT INTO sessions (user_id) VALUES (?)')
+    .run(userId);
   const sessionId = sessionResult.lastInsertRowid as number;
 
   // Get full question data
@@ -200,12 +202,17 @@ export async function POST(request: NextRequest) {
 
 /**
  * PATCH /api/sessions
- * Marks a session as completed.
- *
- * Request body:
- * - sessionId: number
+ * Marks a session as completed. Requires authentication and session ownership.
  */
 export async function PATCH(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
+  }
+
   const body = await request.json();
   const { sessionId } = body as { sessionId: number };
 
@@ -218,12 +225,22 @@ export async function PATCH(request: NextRequest) {
 
   const db = getDb();
 
-  // Check if session exists
-  const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(sessionId);
+  // Check if session exists and belongs to user
+  const session = db
+    .prepare('SELECT * FROM sessions WHERE id = ?')
+    .get(sessionId) as { user_id: number | null } | undefined;
+
   if (!session) {
     return NextResponse.json(
       { error: 'Session not found' },
       { status: 404 }
+    );
+  }
+
+  if (session.user_id !== userId) {
+    return NextResponse.json(
+      { error: 'Forbidden' },
+      { status: 403 }
     );
   }
 

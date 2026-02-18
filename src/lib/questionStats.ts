@@ -63,24 +63,52 @@ export function computeConfidenceLevel(
 /**
  * Get statistics for all questions from the database.
  * Returns a map of questionId -> QuestionStats.
+ * If userId is provided, only includes attempts by that user.
+ * If userId is null, returns empty map (anonymous user = all unseen).
  */
-export function getQuestionStats(db: Database): Map<string, QuestionStats> {
-  const stats = db
-    .prepare(
+export function getQuestionStats(db: Database, userId?: number | null): Map<string, QuestionStats> {
+  if (userId === null) {
+    return new Map();
+  }
+
+  let stats: RawAttemptStats[];
+
+  if (userId !== undefined) {
+    stats = db
+      .prepare(
+        `
+        SELECT
+          question_id,
+          COUNT(*) as total_attempts,
+          SUM(is_correct) as correct_attempts,
+          MAX(created_at) as last_attempt_at,
+          (SELECT is_correct FROM attempts a2
+           WHERE a2.question_id = attempts.question_id AND a2.user_id = ?
+           ORDER BY created_at DESC LIMIT 1) as last_was_correct
+        FROM attempts
+        WHERE user_id = ?
+        GROUP BY question_id
       `
-      SELECT
-        question_id,
-        COUNT(*) as total_attempts,
-        SUM(is_correct) as correct_attempts,
-        MAX(created_at) as last_attempt_at,
-        (SELECT is_correct FROM attempts a2
-         WHERE a2.question_id = attempts.question_id
-         ORDER BY created_at DESC LIMIT 1) as last_was_correct
-      FROM attempts
-      GROUP BY question_id
-    `
-    )
-    .all() as RawAttemptStats[];
+      )
+      .all(userId, userId) as RawAttemptStats[];
+  } else {
+    stats = db
+      .prepare(
+        `
+        SELECT
+          question_id,
+          COUNT(*) as total_attempts,
+          SUM(is_correct) as correct_attempts,
+          MAX(created_at) as last_attempt_at,
+          (SELECT is_correct FROM attempts a2
+           WHERE a2.question_id = attempts.question_id
+           ORDER BY created_at DESC LIMIT 1) as last_was_correct
+        FROM attempts
+        GROUP BY question_id
+      `
+      )
+      .all() as RawAttemptStats[];
+  }
 
   const statsMap = new Map<string, QuestionStats>();
 

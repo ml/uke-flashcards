@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQCodes } from '@/lib/qcodes';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 import {
   getQuestionStats,
   determinePhase,
@@ -46,12 +47,13 @@ export async function GET(request: NextRequest) {
   const shuffledOrderParam = searchParams.get('shuffledOrder');
   const currentIndexParam = searchParams.get('currentIndex');
 
+  const userId = getUserIdFromRequest(request);
   const db = getDb();
   const qCodes = getQCodes();
   const qCodeIds = qCodes.map((q) => q.id);
 
-  // Get stats using shared function
-  const statsMap = getQuestionStats(db);
+  // Get stats using shared function, scoped to user
+  const statsMap = getQuestionStats(db, userId ?? null);
 
   // Determine phase
   const phase = determinePhase(qCodeIds, statsMap);

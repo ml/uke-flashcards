@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "fetch-questions": "tsx scripts/fetch-questions.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "generate-hints": "tsx scripts/generate-hints/index.ts --parallel=4",
     "generate-hints:dry-run": "tsx scripts/generate-hints/index.ts --dry-run",
@@ -16,15 +18,22 @@
     "generate-hints:merge": "tsx scripts/generate-hints/merger.ts --confirm"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
     "cheerio": "^1.0.0",
+    "jose": "^6.1.3",
     "next": "^14.2.35",
     "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.11.0",
     "@types/react": "^19.2.10",
@@ -32,9 +41,11 @@
     "autoprefixer": "^10.4.24",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.18"
   }
 }

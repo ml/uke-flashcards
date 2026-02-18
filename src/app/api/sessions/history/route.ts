@@ -1,8 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getQuestions } from '@/lib/questions';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 
 interface SessionRow {
   id: number;
@@ -19,13 +20,20 @@ interface AttemptRow {
 
 /**
  * GET /api/sessions/history
- * Returns a list of completed sessions with statistics, sorted by most recent first.
+ * Returns a list of sessions with statistics for the authenticated user.
+ * Anonymous users get an empty array.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
+
+  if (!userId) {
+    return NextResponse.json({ sessions: [] });
+  }
+
   const db = getDb();
   const allQuestions = getQuestions();
 
-  // Get all sessions with their attempt counts
+  // Get all sessions for this user with their attempt counts
   const sessions = db
     .prepare(
       `
@@ -37,22 +45,24 @@ export async function GET() {
         SUM(a.is_correct) as correct_count
       FROM sessions s
       LEFT JOIN attempts a ON a.session_id = s.id
+      WHERE s.user_id = ?
       GROUP BY s.id
       ORDER BY s.created_at DESC
       `
     )
-    .all() as SessionRow[];
+    .all(userId) as SessionRow[];
 
-  // Get all attempts for session section breakdown
+  // Get all attempts for this user's sessions for section breakdown
   const sessionAttempts = db
     .prepare(
       `
-      SELECT session_id, question_id
-      FROM attempts
-      WHERE session_id IS NOT NULL
+      SELECT a.session_id, a.question_id
+      FROM attempts a
+      JOIN sessions s ON a.session_id = s.id
+      WHERE s.user_id = ? AND a.session_id IS NOT NULL
       `
     )
-    .all() as AttemptRow[];
+    .all(userId) as AttemptRow[];
 
   // Build a map of session_id -> sections covered
   const sessionSectionsMap = new Map<number, Set<string>>();

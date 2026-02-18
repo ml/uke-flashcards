@@ -5,12 +5,13 @@ import { getDb } from '@/lib/db';
 import { getQuestionById } from '@/lib/questions';
 import { getQCodeById } from '@/lib/qcodes';
 import { getLetterById } from '@/lib/alphabet';
-import type { AttemptInsert } from '@/types/database';
+import { getUserIdFromRequest } from '@/lib/auth-helpers';
 
 /**
  * POST /api/attempts
  * Records a question attempt in the database.
  * Supports exam questions (Q*), Q codes (QC-*), and alphabet letters (AL-*).
+ * Anonymous users: attempt is NOT persisted, but isCorrect/correctAnswer still returned.
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -27,6 +28,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const userId = getUserIdFromRequest(request);
+
   let isCorrect: boolean;
   let correctAnswer: string;
 
@@ -39,11 +42,9 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
-    // For Q codes, selectedAnswer is 'CORRECT' or 'WRONG' (self-assessment)
     isCorrect = selectedAnswer === 'CORRECT';
     correctAnswer = qCode.meaning;
   } else if (questionId.startsWith('AL-')) {
-    // Handle alphabet letters (self-assessment based)
     const letter = getLetterById(questionId);
     if (!letter) {
       return NextResponse.json(
@@ -51,11 +52,9 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
-    // For alphabet, selectedAnswer is 'CORRECT' or 'WRONG' (self-assessment)
     isCorrect = selectedAnswer === 'CORRECT';
     correctAnswer = letter.phonetic;
   } else {
-    // Handle exam questions
     const question = getQuestionById(questionId);
     if (!question) {
       return NextResponse.json(
@@ -67,24 +66,27 @@ export async function POST(request: NextRequest) {
     correctAnswer = question.correctAnswerLetter;
   }
 
+  // Anonymous users: return result without persisting
+  if (!userId) {
+    return NextResponse.json({
+      id: null,
+      isCorrect,
+      correctAnswer,
+    });
+  }
+
   const db = getDb();
   const stmt = db.prepare(`
-    INSERT INTO attempts (question_id, session_id, selected_answer, is_correct)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO attempts (question_id, session_id, selected_answer, is_correct, user_id)
+    VALUES (?, ?, ?, ?, ?)
   `);
 
-  const attemptData: AttemptInsert = {
-    question_id: questionId,
-    session_id: sessionId ?? null,
-    selected_answer: selectedAnswer,
-    is_correct: isCorrect,
-  };
-
   const result = stmt.run(
-    attemptData.question_id,
-    attemptData.session_id,
-    attemptData.selected_answer,
-    attemptData.is_correct ? 1 : 0
+    questionId,
+    sessionId ?? null,
+    selectedAnswer,
+    isCorrect ? 1 : 0,
+    userId
   );
 
   return NextResponse.json({

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { HintsProvider } from "@/components/HintsContext";
+import { AuthProvider } from "@/components/AuthContext";
 import { Navigation } from "@/components/Navigation";
+import { AnonBanner } from "@/components/AnonBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,10 +18,13 @@ export default function RootLayout({
   return (
     <html lang="pl">
       <body className="bg-slate-100 min-h-screen">
-        <HintsProvider>
-          <Navigation />
-          <main className="max-w-4xl mx-auto px-4 py-8">{children}</main>
-        </HintsProvider>
+        <AuthProvider>
+          <HintsProvider>
+            <AnonBanner />
+            <Navigation />
+            <main className="max-w-4xl mx-auto px-4 py-8">{children}</main>
+          </HintsProvider>
+        </AuthProvider>
       </body>
     </html>
   );
