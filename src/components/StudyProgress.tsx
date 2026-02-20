@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 interface StudyProgressProps {
   phase: 'coverage' | 'drilling' | 'mastered';
   stats: {
@@ -13,9 +15,11 @@ interface StudyProgressProps {
     seenPercentage: number;
   };
   onReset?: () => void;
+  disabled?: boolean;
+  disabledMessage?: string;
 }
 
-export function StudyProgress({ phase, stats, onReset }: StudyProgressProps) {
+export function StudyProgress({ phase, stats, onReset, disabled, disabledMessage }: StudyProgressProps) {
   const getPhaseLabel = () => {
     switch (phase) {
       case 'coverage':
@@ -46,7 +50,7 @@ export function StudyProgress({ phase, stats, onReset }: StudyProgressProps) {
         );
 
   return (
-    <div className="bg-slate-100 rounded-lg p-4 mb-6">
+    <div className={`bg-slate-100 rounded-lg p-4 mb-6${disabled ? ' opacity-50' : ''}`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-lg">
@@ -60,7 +64,7 @@ export function StudyProgress({ phase, stats, onReset }: StudyProgressProps) {
               ? `${stats.seenCount}/${stats.total} (${stats.seenPercentage}%)`
               : `${stats.mastered + stats.strong}/${stats.total} mastered`}
           </span>
-          {onReset && (
+          {onReset && !disabled && (
             <button
               onClick={onReset}
               className="text-xs text-slate-500 hover:text-slate-700 underline"
@@ -88,34 +92,40 @@ export function StudyProgress({ phase, stats, onReset }: StudyProgressProps) {
       {/* Phase description */}
       <p className="text-sm text-slate-600 mb-3">{getPhaseDescription()}</p>
 
-      {/* Confidence breakdown */}
-      <div className="flex flex-wrap gap-3 text-xs">
-        {stats.unseen > 0 && (
-          <span className="px-2 py-1 bg-slate-200 rounded text-slate-600">
-            Unseen: {stats.unseen}
-          </span>
-        )}
-        {stats.weak > 0 && (
-          <span className="px-2 py-1 bg-red-100 rounded text-red-700">
-            Weak: {stats.weak}
-          </span>
-        )}
-        {stats.learning > 0 && (
-          <span className="px-2 py-1 bg-amber-100 rounded text-amber-700">
-            Learning: {stats.learning}
-          </span>
-        )}
-        {stats.strong > 0 && (
-          <span className="px-2 py-1 bg-blue-100 rounded text-blue-700">
-            Strong: {stats.strong}
-          </span>
-        )}
-        {stats.mastered > 0 && (
-          <span className="px-2 py-1 bg-green-100 rounded text-green-700">
-            Mastered: {stats.mastered}
-          </span>
-        )}
-      </div>
+      {/* Confidence breakdown or disabled message */}
+      {disabled && disabledMessage ? (
+        <Link href="/login" className="text-sm text-blue-600 hover:text-blue-800 underline">
+          {disabledMessage}
+        </Link>
+      ) : (
+        <div className="flex flex-wrap gap-3 text-xs">
+          {stats.unseen > 0 && (
+            <span className="px-2 py-1 bg-slate-200 rounded text-slate-600">
+              Unseen: {stats.unseen}
+            </span>
+          )}
+          {stats.weak > 0 && (
+            <span className="px-2 py-1 bg-red-100 rounded text-red-700">
+              Weak: {stats.weak}
+            </span>
+          )}
+          {stats.learning > 0 && (
+            <span className="px-2 py-1 bg-amber-100 rounded text-amber-700">
+              Learning: {stats.learning}
+            </span>
+          )}
+          {stats.strong > 0 && (
+            <span className="px-2 py-1 bg-blue-100 rounded text-blue-700">
+              Strong: {stats.strong}
+            </span>
+          )}
+          {stats.mastered > 0 && (
+            <span className="px-2 py-1 bg-green-100 rounded text-green-700">
+              Mastered: {stats.mastered}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

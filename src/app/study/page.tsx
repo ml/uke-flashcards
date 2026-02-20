@@ -704,7 +704,7 @@ function StudyContent() {
 
       {/* Study Progress (only in study mode) */}
       {!sessionMode && stats && (
-        <StudyProgress phase={phase} stats={stats} onReset={handleReset} />
+        <StudyProgress phase={phase} stats={stats} onReset={handleReset} disabled={!user} disabledMessage="Zaloguj się, aby zapisywać postępy nauki" />
       )}
 
       {/* Progress indicator */}
